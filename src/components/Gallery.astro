@@ -75,9 +75,6 @@ const fulls = await Promise.all(slides.map((s) => getImage({ src: s.img, width: 
 
 const zoomBtn =
   'inline-flex h-11 min-w-11 items-center justify-center rounded-full border border-brass-light bg-night/80 px-3 font-sans text-xl font-semibold text-gold transition-colors hover:bg-gold hover:text-night';
-
-const roundBtn =
-  'inline-flex h-12 w-12 items-center justify-center rounded-full border border-brass-light bg-night text-gold transition-colors hover:bg-gold hover:text-night';
 ---
 
 <section
@@ -123,7 +120,11 @@ const roundBtn =
     tabindex="0"
     class="mt-12 outline-offset-8"
   >
-    <div data-stage class="relative mx-auto h-[clamp(21rem,62vw,32rem)] w-full max-w-[1200px] overflow-hidden">
+    <div
+      data-stage
+      class="relative mx-auto h-[clamp(21rem,62vw,32rem)] w-full max-w-[1200px] cursor-grab overflow-hidden active:cursor-grabbing"
+      style="touch-action: pan-y;"
+    >
       {
         slides.map((s, i) => (
           <figure
@@ -152,21 +153,10 @@ const roundBtn =
     <div class="mt-4 px-6 text-center">
       <p data-subtitle class="text-base text-cream/70 sm:text-lg" aria-live="polite">{slides[0].subtitle}</p>
 
-      <div class="mt-6 flex items-center justify-center gap-5">
-        <button type="button" data-prev class={roundBtn} aria-label="Foto anterior">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        </button>
-        <p class="min-w-16 text-center text-base font-medium tabular-nums text-cream/80">
-          <span data-current>01</span> / {String(slides.length).padStart(2, '0')}
-        </p>
-        <button type="button" data-next class={roundBtn} aria-label="Foto siguiente">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        </button>
-      </div>
+      <p class="mt-5 text-base font-medium tabular-nums text-cream/80">
+        <span data-current>01</span> / {String(slides.length).padStart(2, '0')}
+      </p>
+      <p class="mt-2 text-sm text-cream/55 sm:text-base">Desliza o arrastra para ver más fotos</p>
     </div>
   </div>
 
@@ -225,6 +215,9 @@ const roundBtn =
     border-color: #d4b27a;
     cursor: pointer;
   }
+  .is-dragging .spin-card {
+    transition: none;
+  }
   .lightbox::backdrop {
     background: rgb(0 0 0 / 0.35);
     -webkit-backdrop-filter: blur(18px);
@@ -257,30 +250,30 @@ const roundBtn =
     const N = cards.length;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    let pos = 0; // posición continua: el carrusel sigue al dedo o al mouse
     let active = 0;
     const prevD: number[] = cards.map(() => NaN);
 
-    const rel = (i: number) => {
-      let d = (i - active) % N;
-      if (d > N / 2) d -= N;
-      if (d < -N / 2) d += N;
-      return d;
+    const norm = (d: number) => {
+      const m = ((d % N) + N) % N;
+      return m > N / 2 ? m - N : m;
     };
 
     const render = () => {
       const unit = Math.min(stage.clientWidth, 1100);
       const dx = unit * 0.115;
       const dy = unit * 0.065;
+      active = ((Math.round(pos) % N) + N) % N;
       cards.forEach((el, i) => {
-        const d = rel(i);
+        const d = norm(i - pos);
         const a = Math.abs(d);
-        const wrapped = !Number.isNaN(prevD[i]) && Math.abs(d - prevD[i]) > 1.5;
+        const wrapped = !Number.isNaN(prevD[i]) && Math.abs(d - prevD[i]) > N / 2;
         if (wrapped) el.style.transition = 'none';
         el.style.transform = `translate(-50%, -50%) translate(${d * dx}px, ${d * dy}px) scale(${1 - 0.12 * a})`;
         el.style.filter = a > 1 ? `blur(${(a - 1) * 2.5}px)` : 'none';
-        el.style.opacity = String(a >= 3 ? 0.55 : 1 - a * 0.1);
+        el.style.opacity = String(Math.max(0.5, 1 - a * 0.1));
         el.style.zIndex = String(10 - Math.round(a));
-        el.setAttribute('data-active', String(d === 0));
+        el.setAttribute('data-active', String(a < 0.5));
         if (wrapped) {
           void el.offsetWidth;
           requestAnimationFrame(() => (el.style.transition = ''));
@@ -291,13 +284,14 @@ const roundBtn =
       current.textContent = String(active + 1).padStart(2, '0');
     };
 
-    const go = (n: number) => {
-      active = (n + N) % N;
+    const snapTo = (target: number) => {
+      pos = target;
       render();
     };
+    const step = (n: number) => snapTo(Math.round(pos) + n);
+    const go = (i: number) => snapTo(Math.round(pos) + norm(i - Math.round(pos)));
+    const stepPx = () => Math.max(Math.min(stage.clientWidth, 1100) * 0.18, 70);
 
-    root.querySelector('[data-prev]')?.addEventListener('click', () => go(active - 1));
-    root.querySelector('[data-next]')?.addEventListener('click', () => go(active + 1));
     const box = root.parentElement!.querySelector<HTMLDialogElement>('[data-lightbox]')!;
     const boxImg = box.querySelector<HTMLImageElement>('[data-lightbox-img]')!;
     let dragged = false;
@@ -436,32 +430,81 @@ const roundBtn =
       })
     );
     root.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') go(active - 1);
-      if (e.key === 'ArrowRight') go(active + 1);
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
     });
 
-    // Deslizar con el dedo o el mouse
-    let startX = 0;
+    // Arrastrar con el mouse o deslizar con el dedo: el carrusel sigue al puntero
     let down = false;
+    let swiped = false;
+    let startX = 0;
+    let startPos = 0;
+    let lastX = 0;
+    let lastT = 0;
+    let vel = 0;
+
     stage.addEventListener('pointerdown', (e) => {
       down = true;
-      startX = e.clientX;
+      swiped = false;
+      startX = lastX = e.clientX;
+      startPos = pos;
+      lastT = performance.now();
+      vel = 0;
     });
-    window.addEventListener('pointerup', (e) => {
+    stage.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dxp = e.clientX - startX;
+      if (!swiped && Math.abs(dxp) > 6) {
+        swiped = true;
+        root.classList.add('is-dragging');
+        stage.setPointerCapture(e.pointerId);
+      }
+      if (!swiped) return;
+      const now = performance.now();
+      const dt = now - lastT;
+      if (dt > 0) vel = 0.8 * vel + 0.2 * (-(e.clientX - lastX) / stepPx() / dt);
+      lastX = e.clientX;
+      lastT = now;
+      pos = startPos - dxp / stepPx();
+      render();
+    });
+    const endDrag = () => {
       if (!down) return;
       down = false;
-      const dx = e.clientX - startX;
-      dragged = Math.abs(dx) > 10;
+      if (!swiped) return;
+      root.classList.remove('is-dragging');
+      dragged = true;
       setTimeout(() => (dragged = false), 0);
-      if (Math.abs(dx) > 50) go(active + (dx < 0 ? 1 : -1));
-    });
+      snapTo(Math.round(pos + vel * 150));
+    };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    // Trackpad / rueda horizontal
+    let wheelTimer = 0;
+    stage.addEventListener(
+      'wheel',
+      (e) => {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // el scroll vertical sigue siendo de la página
+        e.preventDefault();
+        root.classList.add('is-dragging');
+        pos += e.deltaX / stepPx();
+        render();
+        window.clearTimeout(wheelTimer);
+        wheelTimer = window.setTimeout(() => {
+          root.classList.remove('is-dragging');
+          snapTo(Math.round(pos));
+        }, 120);
+      },
+      { passive: false }
+    );
 
     // Giro automático (se pausa al interactuar o fuera de pantalla)
     let paused = false;
     let visible = false;
     if (!reduced) {
       setInterval(() => {
-        if (!paused && visible && !document.hidden) go(active + 1);
+        if (!paused && visible && !document.hidden) step(1);
       }, 3800);
     }
     root.addEventListener('pointerenter', () => (paused = true));

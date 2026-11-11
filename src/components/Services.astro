@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import FluxLines from '@/components/flux-lines/FluxLines';
+import KidsCard from '@/components/KidsCard.astro';
 import pole from '@/assets/barber-pole.png';
 import { categories, formatPrice } from '@/data/services';
 import type { ServiceCategory } from '@/data/services';
@@ -83,7 +84,10 @@ const catTitle = 'text-lg font-semibold uppercase tracking-[0.08em] text-brass-l
         <!-- Columna izquierda -->
         <div class="space-y-6">
           {
-            left.map((cat) => (
+            left.map((cat) =>
+              cat.id === 'kids' ? (
+                <KidsCard cat={cat} />
+              ) : (
               <article class={card} aria-labelledby={`cat-${cat.id}`}>
                 <h3 id={`cat-${cat.id}`} class={catTitle}>
                   {cat.title}
@@ -107,7 +111,8 @@ const catTitle = 'text-lg font-semibold uppercase tracking-[0.08em] text-brass-l
                   ))}
                 </ul>
               </article>
-            ))
+              )
+            )
           }
         </div>
 

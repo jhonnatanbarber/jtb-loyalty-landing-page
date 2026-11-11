@@ -1,0 +1,115 @@
+---
+import { formatPrice } from '@/data/services';
+import type { ServiceCategory } from '@/data/services';
+
+interface Props {
+  cat: ServiceCategory;
+}
+const { cat } = Astro.props;
+
+// Colores de la marca "Kids Barbers" de la carta.
+const letters = [
+  { c: 'K', color: '#ff5a5f' },
+  { c: 'I', color: '#ffb02e' },
+  { c: 'D', color: '#ffe14d' },
+  { c: 'S', color: '#4cd964' },
+];
+---
+
+<article
+  aria-labelledby={`cat-${cat.id}`}
+  class="kids relative overflow-hidden rounded-3xl border-2 border-dashed border-[#ffe14d]/70 bg-[#0e0e0e] p-6 sm:p-10"
+>
+  <!-- Decoración -->
+  <svg class="kids-float absolute right-6 top-5 h-9 w-9 text-[#ffe14d]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2l2.9 6.6 7.1.7-5.3 4.7 1.6 7L12 17.3 5.7 21l1.6-7L2 9.3l7.1-.7L12 2z"></path>
+  </svg>
+  <svg class="kids-float kids-delay-1 absolute right-20 top-12 h-5 w-5 text-[#3aa0ff]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2l2.9 6.6 7.1.7-5.3 4.7 1.6 7L12 17.3 5.7 21l1.6-7L2 9.3l7.1-.7L12 2z"></path>
+  </svg>
+  <span class="kids-float kids-delay-2 absolute bottom-8 right-8 h-4 w-4 rounded-full bg-[#ff5a5f]" aria-hidden="true"></span>
+  <span class="kids-float kids-delay-3 absolute bottom-20 right-4 h-3 w-3 rounded-full bg-[#4cd964]" aria-hidden="true"></span>
+  <svg class="kids-float kids-delay-1 absolute bottom-6 left-6 h-8 w-12 text-[#3aa0ff]" viewBox="0 0 48 32" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 22c5-12 9-12 14 0s9 12 14 0 9-12 14 0"></path>
+  </svg>
+  <span class="kids-float kids-delay-3 absolute bottom-24 left-3 h-3 w-3 rotate-45 bg-[#ffb02e]" aria-hidden="true"></span>
+
+  <!-- Título -->
+  <h3 id={`cat-${cat.id}`} class="relative font-kids text-5xl font-bold leading-none sm:text-6xl">
+    <span class="inline-flex" aria-hidden="true">
+      {letters.map((l, i) => (
+        <span class="kids-letter inline-block" style={`color:${l.color}; animation-delay:${i * 0.15}s`}>{l.c}</span>
+      ))}
+    </span>
+    <span class="sr-only">Kids</span>
+    <span class="ml-2 text-cream">Barbers</span>
+  </h3>
+  <p
+    class="relative mt-4 inline-block rounded-full bg-[#3aa0ff] px-4 py-1 text-sm font-semibold uppercase tracking-[0.06em] text-night"
+  >
+    {cat.subtitle}
+  </p>
+
+  <!-- Servicios -->
+  <ul class="relative mt-8 space-y-5">
+    {
+      cat.items.map((s) => (
+        <li>
+          <div class="flex items-center gap-3">
+            <span class="font-kids text-xl font-semibold sm:text-2xl">{s.name}</span>
+            <span class="min-w-4 flex-1 self-end border-b-2 border-dotted border-[#ffe14d]/50 mb-2" aria-hidden="true" />
+            <span class="whitespace-nowrap rounded-full bg-[#ffe14d] px-4 py-1 font-kids text-lg font-bold text-night sm:text-xl">
+              {formatPrice(s)}
+            </span>
+          </div>
+          {s.note && <p class="mt-1 text-base text-cream/75">{s.note}</p>}
+        </li>
+      ))
+    }
+  </ul>
+</article>
+
+<style>
+  .kids-float {
+    animation: kids-float 4.5s ease-in-out infinite alternate;
+  }
+  .kids-delay-1 {
+    animation-delay: -1.2s;
+  }
+  .kids-delay-2 {
+    animation-delay: -2.4s;
+  }
+  .kids-delay-3 {
+    animation-delay: -3.3s;
+  }
+  .kids-letter {
+    animation: kids-bounce 2.4s ease-in-out infinite;
+  }
+  .kids:hover .kids-letter {
+    animation-duration: 0.9s;
+  }
+  @keyframes kids-float {
+    from {
+      transform: translateY(0) rotate(-8deg);
+    }
+    to {
+      transform: translateY(-10px) rotate(10deg);
+    }
+  }
+  @keyframes kids-bounce {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-8px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kids-float,
+    .kids-letter {
+      animation: none;
+    }
+  }
+</style>
