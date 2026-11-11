@@ -1,16 +1,100 @@
 ---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FluxLines from '@/components/flux-lines/FluxLines';
+import logo from '@/assets/logo-v2.png';
+import Services from '@/components/Services.astro';
+import Promotions from '@/components/Promotions.astro';
+import Gallery from '@/components/Gallery.astro';
+import { whatsappUrl } from '@/data/contact';
+
+const whatsapp = whatsappUrl();
+
+const nav = [
+  { label: 'Promociones', href: '#promociones' },
+  { label: 'Beneficios', href: '#fidelizacion' },
+  { label: 'Galería', href: '#galeria' },
+  { label: 'Ubicación', href: '#ubicacion' },
+];
+
+const label = 'font-sans text-base font-semibold uppercase tracking-[0.12em] text-brass-light';
+const btn =
+  'inline-flex min-h-14 items-center justify-center rounded px-9 font-sans text-base font-semibold uppercase tracking-[0.06em] transition-colors';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+  <div class="relative isolate flex h-svh select-none flex-col overflow-hidden bg-night text-cream">
+    <!-- Animación a pantalla completa -->
+    <div class="absolute inset-0 -z-10 opacity-60">
+      <FluxLines
+        client:load
+        colors={['#a8834a', '#a8834a', '#a8834a']}
+        glow={2}
+        rimWidth={0.2}
+        lineWidth={1}
+        flowDirection="down"
+        mouseInteraction
+        clickSwirl
+      />
+    </div>
+
+    <!-- Barra superior -->
+    <header class="flex items-center justify-end px-6 pt-5 lg:px-10">
+      <nav aria-label="Principal" class="hidden gap-8 md:flex">
+        {
+          nav.map((l) => (
+            <a href={l.href} class={`${label} transition-colors hover:text-cream`}>
+              {l.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+
+    <!-- Escena principal centrada -->
+    <main class="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 pb-20 pt-3 text-center sm:gap-4">
+      <!-- Logo completo (v2) -->
+      <h1 class="flex min-h-0 w-full flex-1 items-center justify-center">
+        <Image
+          src={logo}
+          alt="Jhonnatan The Barber"
+          width={1400}
+          loading="eager"
+          draggable="false"
+          class="pointer-events-none h-auto w-auto max-h-[calc(100svh-20rem)] max-w-[min(90vw,780px)] object-contain"
+        />
+      </h1>
+
+      <blockquote
+        class="max-w-5xl [text-shadow:0_2px_24px_rgba(0,0,0,0.95),0_0_6px_rgba(0,0,0,0.8)]"
+      >
+        <p class="font-display text-[clamp(1.75rem,4vw,3.25rem)] font-medium italic leading-snug">
+          “Un buen corte no se ve, <span class="text-brass-light">se siente.</span>”
+        </p>
+        <footer class={`${label} mt-2 [text-shadow:0_0_12px_#000]`}>Afilando estilo desde 2015</footer>
+      </blockquote>
+
+      <div class="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
+        <a
+          href={whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={`${btn} bg-cream text-night hover:bg-white`}
+        >
+          Reservar por WhatsApp
+        </a>
+        <a
+          href="#servicios"
+          class={`${btn} border border-cream/40 bg-night/60 text-cream hover:border-brass-light`}
+        >
+          Ver servicios
+        </a>
+      </div>
+    </main>
+
+  </div>
+
+  <Services whatsapp={whatsapp} />
+  <Promotions />
+  <Gallery whatsapp={whatsapp} />
+</BaseLayout>

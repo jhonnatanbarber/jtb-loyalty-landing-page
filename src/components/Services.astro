@@ -1,0 +1,172 @@
+---
+import { Image } from 'astro:assets';
+import FluxLines from '@/components/flux-lines/FluxLines';
+import pole from '@/assets/barber-pole.png';
+import { categories, formatPrice } from '@/data/services';
+import type { ServiceCategory } from '@/data/services';
+import { promotions } from '@/data/promotions';
+
+const minPromo = Math.min(...promotions.map((p) => p.price));
+
+interface Props {
+  whatsapp: string;
+}
+const { whatsapp } = Astro.props;
+
+const byId = (id: string): ServiceCategory => categories.find((c) => c.id === id)!;
+const main = byId('servicios');
+const left = ['colorimetria', 'bebidas', 'kids'].map(byId);
+const totalStyle = byId('total-style');
+
+const card = 'rounded-lg border border-brass/30 bg-night/85 p-6 sm:p-10';
+const catTitle = 'text-lg font-semibold uppercase tracking-[0.08em] text-brass-light sm:text-2xl';
+---
+
+<section
+  id="servicios"
+  aria-labelledby="servicios-title"
+  class="relative isolate select-none overflow-hidden border-t border-brass/30 bg-night px-6 py-24 font-sans text-cream lg:px-10 lg:py-32"
+>
+  <div class="absolute inset-0 -z-10 opacity-60">
+    <FluxLines
+      client:visible
+      colors={['#a8834a', '#a8834a', '#a8834a']}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+    />
+  </div>
+
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Encabezado -->
+    <header class="text-center">
+      <p class="text-base font-semibold uppercase tracking-[0.12em] sm:text-lg text-brass-light">Lo que hacemos</p>
+      <h2
+        id="servicios-title"
+        class="mt-4 text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl lg:text-6xl"
+      >
+        Servicios
+      </h2>
+      <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+        <span class="h-2 w-2 rotate-45 bg-brass"></span>
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+      </div>
+    </header>
+
+    <div class="mt-16 space-y-6">
+      <!-- Nuestros servicios -->
+      <article class={card} aria-labelledby={`cat-${main.id}`}>
+        <h3 id={`cat-${main.id}`} class={`${catTitle} text-center`}>{main.title}</h3>
+        <ul class="mt-8 grid gap-x-16 gap-y-5 md:grid-cols-2">
+          {
+            main.items.map((s) => (
+              <li class="flex items-baseline gap-3">
+                <span class="text-lg font-medium sm:text-xl">
+                  {s.name}
+                  {s.note && <span class="ml-1 text-sm text-cream/60 sm:text-base">({s.note})</span>}
+                </span>
+                <span class="mb-1 min-w-4 flex-1 self-end border-b border-dotted border-brass/60" aria-hidden="true" />
+                <span class="whitespace-nowrap text-lg font-semibold text-brass-light sm:text-xl">
+                  {formatPrice(s)}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+
+      <div class="grid items-start gap-6 md:grid-cols-2">
+        <!-- Columna izquierda -->
+        <div class="space-y-6">
+          {
+            left.map((cat) => (
+              <article class={card} aria-labelledby={`cat-${cat.id}`}>
+                <h3 id={`cat-${cat.id}`} class={catTitle}>
+                  {cat.title}
+                </h3>
+                {cat.subtitle && (
+                  <p class="mt-1 text-sm uppercase tracking-[0.1em] text-cream/60">{cat.subtitle}</p>
+                )}
+                <ul class="mt-6 space-y-4">
+                  {cat.items.map((s) => (
+                    <li>
+                      <div class="flex items-baseline gap-3">
+                        <span class="text-lg font-medium sm:text-xl">{s.name}</span>
+                        <span
+                          class="mb-1 min-w-4 flex-1 self-end border-b border-dotted border-brass/60"
+                          aria-hidden="true"
+                        />
+                        <span class="whitespace-nowrap text-lg font-semibold text-brass-light sm:text-xl">{formatPrice(s)}</span>
+                      </div>
+                      {s.note && <p class="mt-1 text-base text-cream/60">{s.note}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))
+          }
+        </div>
+
+        <!-- Total Style -->
+        <article class={card} aria-labelledby={`cat-${totalStyle.id}`}>
+          <h3 id={`cat-${totalStyle.id}`} class={catTitle}>{totalStyle.title}</h3>
+          <ul class="mt-6 space-y-3">
+            {
+              totalStyle.items.map((s) => (
+                <li class="flex items-baseline gap-3 text-base sm:text-lg">
+                  <span>{s.name}</span>
+                  <span class="mb-1 min-w-4 flex-1 self-end border-b border-dotted border-brass/60" aria-hidden="true" />
+                  <span class="whitespace-nowrap font-semibold text-brass-light">{formatPrice(s)}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </article>
+      </div>
+    </div>
+
+    <!-- Banner de promociones -->
+    <a
+      href="#promociones"
+      class="group mt-16 flex flex-col items-center gap-8 rounded-lg border-2 border-brass-light bg-[#0e0e0e] px-6 py-10 text-center transition-colors hover:border-gold sm:px-10 md:flex-row md:text-left"
+    >
+      <Image
+        src={pole}
+        alt=""
+        height={320}
+        draggable="false"
+        class="pointer-events-none h-36 w-auto shrink-0 transition-transform duration-300 group-hover:scale-105 md:h-44"
+      />
+      <div class="flex-1">
+        <p class="font-sans text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">Ahorra en cada visita</p>
+        <p class="mt-3 font-sans text-3xl font-semibold uppercase leading-tight tracking-[0.02em] sm:text-4xl lg:text-5xl">
+          ¡Tenemos <span class="text-gold">promociones!</span>
+        </p>
+        <p class="mt-3 text-base text-cream/80 sm:text-lg">
+          Paquetes completos desde <span class="font-semibold text-gold">S/ {minPromo}</span>. Mira cuál va contigo.
+        </p>
+      </div>
+      <span
+        class="inline-flex min-h-14 shrink-0 items-center justify-center gap-3 rounded bg-gold px-8 font-sans text-base font-semibold uppercase tracking-[0.06em] text-night transition-colors group-hover:bg-cream"
+      >
+        Ver promociones
+      </span>
+    </a>
+
+    <!-- CTA -->
+    <div class="mt-10 text-center">
+      <a
+        href={whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex min-h-16 items-center justify-center rounded bg-gold px-12 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream"
+      >
+        Reservar mi cita
+      </a>
+    </div>
+  </div>
+</section>

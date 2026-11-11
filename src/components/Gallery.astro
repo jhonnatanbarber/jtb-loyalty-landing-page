@@ -1,0 +1,476 @@
+---
+import { Image, getImage } from 'astro:assets';
+import FluxLines from '@/components/flux-lines/FluxLines';
+import fachada from '@/assets/gallery/fachada.jpg';
+import interior from '@/assets/gallery/interior.jpg';
+
+interface Props {
+  whatsapp: string;
+}
+const { whatsapp } = Astro.props;
+
+// Cada tarjeta es un encuadre (zoom + punto focal) de una foto real.
+// Para usar fotos nuevas: importarlas arriba y sumarlas a esta lista.
+const slides = [
+  {
+    img: fachada,
+    zoom: 1,
+    origin: '50% 50%',
+    title: 'La fachada',
+    subtitle: 'Jhonnatan The Barber · Desde 2015',
+    alt: 'Fachada de Jhonnatan The Barber con su letrero negro y el local iluminado por dentro',
+  },
+  {
+    img: fachada,
+    zoom: 1.7,
+    origin: '50% 22%',
+    title: 'El letrero',
+    subtitle: 'Nuestra marca, desde 2015',
+    alt: 'Letrero de Jhonnatan The Barber con las letras blancas y la inscripción Since 2015',
+  },
+  {
+    img: interior,
+    zoom: 1,
+    origin: '50% 50%',
+    title: 'Dentro del local',
+    subtitle: 'Barberos atendiendo bajo luces hexagonales',
+    alt: 'Interior de la barbería con barberos atendiendo a clientes',
+  },
+  {
+    img: interior,
+    zoom: 1.9,
+    origin: '24% 74%',
+    title: 'Sillones dorados',
+    subtitle: 'Comodidad y estilo en cada corte',
+    alt: 'Sillón de barbero dorado con un cliente siendo atendido',
+  },
+  {
+    img: interior,
+    zoom: 2,
+    origin: '72% 14%',
+    title: 'Luces hexagonales',
+    subtitle: 'Un ambiente moderno y luminoso',
+    alt: 'Techo del local con luces LED en forma de hexágonos',
+  },
+  {
+    img: interior,
+    zoom: 2,
+    origin: '48% 44%',
+    title: 'Manos a la obra',
+    subtitle: 'Profesionales en cada detalle',
+    alt: 'Barberos trabajando en el corte de cabello de sus clientes',
+  },
+  {
+    img: fachada,
+    zoom: 2.2,
+    origin: '86% 62%',
+    title: 'Productos y perfumes',
+    subtitle: 'Cuidado personal en el mismo lugar',
+    alt: 'Vitrina de productos y perfumes dentro de la barbería',
+  },
+];
+
+// Versión a tamaño real de cada foto, para la ventana emergente.
+const fulls = await Promise.all(slides.map((s) => getImage({ src: s.img, width: s.img.width })));
+
+const zoomBtn =
+  'inline-flex h-11 min-w-11 items-center justify-center rounded-full border border-brass-light bg-night/80 px-3 font-sans text-xl font-semibold text-gold transition-colors hover:bg-gold hover:text-night';
+
+const roundBtn =
+  'inline-flex h-12 w-12 items-center justify-center rounded-full border border-brass-light bg-night text-gold transition-colors hover:bg-gold hover:text-night';
+---
+
+<section
+  id="galeria"
+  aria-labelledby="galeria-title"
+  class="relative isolate select-none overflow-hidden border-t border-brass/30 bg-night py-24 font-sans text-cream lg:py-32"
+>
+  <div class="absolute inset-0 -z-10 opacity-60">
+    <FluxLines
+      client:visible
+      colors={['#a8834a', '#a8834a', '#a8834a']}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+    />
+  </div>
+
+  <!-- Encabezado -->
+  <header class="px-6 text-center lg:px-10">
+    <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">Nuestro espacio</p>
+    <h2
+      id="galeria-title"
+      class="mt-4 text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl lg:text-6xl"
+    >
+      Galería
+    </h2>
+    <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+      <span class="h-px w-16 bg-brass sm:w-28"></span>
+      <span class="h-2 w-2 rotate-45 bg-brass"></span>
+      <span class="h-px w-16 bg-brass sm:w-28"></span>
+    </div>
+  </header>
+
+  <!-- Carrusel giratorio -->
+  <div
+    data-spin
+    role="region"
+    aria-roledescription="carrusel"
+    aria-label="Galería de fotos de la barbería"
+    tabindex="0"
+    class="mt-12 outline-offset-8"
+  >
+    <div data-stage class="relative mx-auto h-[clamp(21rem,62vw,32rem)] w-full max-w-[1200px] overflow-hidden">
+      {
+        slides.map((s, i) => (
+          <figure
+            data-card
+            data-full={fulls[i].src}
+            data-alt={s.alt}
+            aria-label={`${s.title}, ${i + 1} de ${slides.length}`}
+            class="spin-card absolute left-1/2 top-1/2 aspect-square w-[clamp(11rem,30vw,20rem)] cursor-pointer overflow-hidden rounded-xl border-2"
+          >
+            <Image
+              src={s.img}
+              alt={s.alt}
+              widths={[480, 720, 960, 1280]}
+              sizes="(min-width: 1024px) 640px, 60vw"
+              loading={i < 3 ? 'eager' : 'lazy'}
+              draggable="false"
+              style={`transform: scale(${s.zoom}); transform-origin: ${s.origin};`}
+              class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            />
+          </figure>
+        ))
+      }
+    </div>
+
+    <!-- Leyenda y controles -->
+    <div class="mt-4 px-6 text-center">
+      <p data-subtitle class="text-base text-cream/70 sm:text-lg" aria-live="polite">{slides[0].subtitle}</p>
+
+      <div class="mt-6 flex items-center justify-center gap-5">
+        <button type="button" data-prev class={roundBtn} aria-label="Foto anterior">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <p class="min-w-16 text-center text-base font-medium tabular-nums text-cream/80">
+          <span data-current>01</span> / {String(slides.length).padStart(2, '0')}
+        </p>
+        <button type="button" data-next class={roundBtn} aria-label="Foto siguiente">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ventana emergente: solo la foto -->
+  <dialog
+    data-lightbox
+    aria-label="Foto ampliada"
+    class="lightbox m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0"
+  >
+    <div data-lb-stage class="flex h-full w-full items-center justify-center overflow-hidden">
+      <img
+        data-lightbox-img
+        src=""
+        alt=""
+        draggable="false"
+        class="block h-auto max-h-[75svh] w-auto max-w-[min(90vw,720px)] select-none"
+        style="touch-action: none;"
+      />
+    </div>
+    <div data-zoom-ui class="fixed bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-3">
+      <button type="button" data-zoom-out class={zoomBtn} aria-label="Alejar">−</button>
+      <button type="button" data-zoom-reset class={`${zoomBtn} min-w-20 text-sm`} aria-label="Tamaño original">
+        <span data-zoom-level>100%</span>
+      </button>
+      <button type="button" data-zoom-in class={zoomBtn} aria-label="Acercar">+</button>
+    </div>
+  </dialog>
+
+  <!-- Cierre -->
+  <div class="mt-20 px-6 text-center">
+    <p class="text-2xl font-semibold uppercase tracking-[0.04em] sm:text-3xl">
+      Ven a vivir la <span class="text-gold">experiencia</span>
+    </p>
+    <a
+      href={whatsapp}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-8 inline-flex min-h-16 items-center justify-center rounded bg-gold px-12 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream"
+    >
+      Reservar mi cita
+    </a>
+  </div>
+</section>
+
+<style is:global>
+  .spin-card {
+    border-color: rgb(168 131 74 / 0.4);
+    transition:
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.9s,
+      border-color 0.6s;
+    will-change: transform, filter;
+  }
+  .spin-card[data-active='true'] {
+    border-color: #d4b27a;
+    cursor: pointer;
+  }
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 0.35);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+  }
+  .lightbox:not([open]) {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spin-card {
+      transition: none;
+    }
+  }
+</style>
+
+<script is:inline type="application/json" id="spin-data" set:html={JSON.stringify(slides.map(({ title, subtitle }) => ({ title, subtitle })))} />
+
+<script>
+  const DATA = JSON.parse(document.getElementById('spin-data')?.textContent ?? '[]') as {
+    title: string;
+    subtitle: string;
+  }[];
+
+  const root = document.querySelector<HTMLElement>('[data-spin]');
+  if (root) {
+    const stage = root.querySelector<HTMLElement>('[data-stage]')!;
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-card]'));
+    const subtitle = root.querySelector<HTMLElement>('[data-subtitle]')!;
+    const current = root.querySelector<HTMLElement>('[data-current]')!;
+    const N = cards.length;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let active = 0;
+    const prevD: number[] = cards.map(() => NaN);
+
+    const rel = (i: number) => {
+      let d = (i - active) % N;
+      if (d > N / 2) d -= N;
+      if (d < -N / 2) d += N;
+      return d;
+    };
+
+    const render = () => {
+      const unit = Math.min(stage.clientWidth, 1100);
+      const dx = unit * 0.115;
+      const dy = unit * 0.065;
+      cards.forEach((el, i) => {
+        const d = rel(i);
+        const a = Math.abs(d);
+        const wrapped = !Number.isNaN(prevD[i]) && Math.abs(d - prevD[i]) > 1.5;
+        if (wrapped) el.style.transition = 'none';
+        el.style.transform = `translate(-50%, -50%) translate(${d * dx}px, ${d * dy}px) scale(${1 - 0.12 * a})`;
+        el.style.filter = a > 1 ? `blur(${(a - 1) * 2.5}px)` : 'none';
+        el.style.opacity = String(a >= 3 ? 0.55 : 1 - a * 0.1);
+        el.style.zIndex = String(10 - Math.round(a));
+        el.setAttribute('data-active', String(d === 0));
+        if (wrapped) {
+          void el.offsetWidth;
+          requestAnimationFrame(() => (el.style.transition = ''));
+        }
+        prevD[i] = d;
+      });
+      subtitle.textContent = DATA[active]?.subtitle ?? '';
+      current.textContent = String(active + 1).padStart(2, '0');
+    };
+
+    const go = (n: number) => {
+      active = (n + N) % N;
+      render();
+    };
+
+    root.querySelector('[data-prev]')?.addEventListener('click', () => go(active - 1));
+    root.querySelector('[data-next]')?.addEventListener('click', () => go(active + 1));
+    const box = root.parentElement!.querySelector<HTMLDialogElement>('[data-lightbox]')!;
+    const boxImg = box.querySelector<HTMLImageElement>('[data-lightbox-img]')!;
+    let dragged = false;
+
+    // ---- Zoom dentro de la ventana emergente ----
+    const stageLb = box.querySelector<HTMLElement>('[data-lb-stage]')!;
+    const level = box.querySelector<HTMLElement>('[data-zoom-level]')!;
+    const MIN = 1;
+    const MAX = 5;
+    let z = { s: 1, x: 0, y: 0 };
+    let moved = false;
+
+    const clampPan = () => {
+      const maxX = (boxImg.offsetWidth * (z.s - 1)) / 2;
+      const maxY = (boxImg.offsetHeight * (z.s - 1)) / 2;
+      z.x = Math.min(maxX, Math.max(-maxX, z.x));
+      z.y = Math.min(maxY, Math.max(-maxY, z.y));
+    };
+    const applyZoom = (animate = false) => {
+      clampPan();
+      boxImg.style.transition = animate ? 'transform 0.2s ease-out' : 'none';
+      boxImg.style.transform = `translate(${z.x}px, ${z.y}px) scale(${z.s})`;
+      boxImg.style.cursor = z.s > 1 ? 'grab' : 'default';
+      level.textContent = `${Math.round(z.s * 100)}%`;
+    };
+    const zoomAt = (next: number, cx: number, cy: number, animate = false) => {
+      const s2 = Math.min(MAX, Math.max(MIN, next));
+      const r = boxImg.getBoundingClientRect();
+      const lx = r.left + r.width / 2 - z.x; // centro sin desplazar
+      const ly = r.top + r.height / 2 - z.y;
+      const ox = cx - lx;
+      const oy = cy - ly;
+      z.x = ox - (ox - z.x) * (s2 / z.s);
+      z.y = oy - (oy - z.y) * (s2 / z.s);
+      z.s = s2;
+      if (z.s === 1) z = { s: 1, x: 0, y: 0 };
+      applyZoom(animate);
+    };
+    const center = (): [number, number] => {
+      const r = stageLb.getBoundingClientRect();
+      return [r.left + r.width / 2, r.top + r.height / 2];
+    };
+    const resetZoom = () => {
+      z = { s: 1, x: 0, y: 0 };
+      applyZoom();
+    };
+
+    boxImg.addEventListener('dblclick', (e) => zoomAt(z.s > 1 ? 1 : 2.5, e.clientX, e.clientY, true));
+    box.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
+        zoomAt(z.s * Math.exp(-e.deltaY * 0.0018), e.clientX, e.clientY);
+      },
+      { passive: false }
+    );
+    box.querySelector('[data-zoom-in]')?.addEventListener('click', () => zoomAt(z.s * 1.5, ...center(), true));
+    box.querySelector('[data-zoom-out]')?.addEventListener('click', () => zoomAt(z.s / 1.5, ...center(), true));
+    box.querySelector('[data-zoom-reset]')?.addEventListener('click', () => zoomAt(1, ...center(), true));
+    box.addEventListener('keydown', (e) => {
+      if (e.key === '+' || e.key === '=') zoomAt(z.s * 1.5, ...center(), true);
+      if (e.key === '-') zoomAt(z.s / 1.5, ...center(), true);
+      if (e.key === '0') zoomAt(1, ...center(), true);
+    });
+
+    // Arrastrar (mover) y pellizcar (táctil)
+    const pts = new Map<number, { x: number; y: number }>();
+    let pinch = 0;
+    boxImg.addEventListener('pointerdown', (e) => {
+      boxImg.setPointerCapture(e.pointerId);
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      moved = false;
+      if (pts.size === 2) {
+        const [p, q] = [...pts.values()];
+        pinch = Math.hypot(p.x - q.x, p.y - q.y);
+      }
+      if (z.s > 1) boxImg.style.cursor = 'grabbing';
+    });
+    boxImg.addEventListener('pointermove', (e) => {
+      const p = pts.get(e.pointerId);
+      if (!p) return;
+      if (pts.size === 2) {
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const [a1, b1] = [...pts.values()];
+        const d = Math.hypot(a1.x - b1.x, a1.y - b1.y);
+        if (pinch > 0) zoomAt(z.s * (d / pinch), (a1.x + b1.x) / 2, (a1.y + b1.y) / 2);
+        pinch = d;
+        moved = true;
+        return;
+      }
+      const dx = e.clientX - p.x;
+      const dy = e.clientY - p.y;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (Math.abs(dx) + Math.abs(dy) > 1) moved = true;
+      if (z.s > 1) {
+        z.x += dx;
+        z.y += dy;
+        applyZoom();
+      }
+    });
+    const endPointer = (e: PointerEvent) => {
+      pts.delete(e.pointerId);
+      pinch = 0;
+      if (z.s > 1) boxImg.style.cursor = 'grab';
+    };
+    boxImg.addEventListener('pointerup', endPointer);
+    boxImg.addEventListener('pointercancel', endPointer);
+
+    const openBox = (el: HTMLElement) => {
+      boxImg.src = el.dataset.full ?? '';
+      boxImg.alt = el.dataset.alt ?? '';
+      resetZoom();
+      box.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    };
+    // Cerrar con clic fuera de la foto y de los controles
+    box.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t === boxImg || t.closest('[data-zoom-ui]') || moved) {
+        moved = false;
+        return;
+      }
+      box.close();
+    });
+    box.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+      boxImg.src = '';
+      resetZoom();
+    });
+
+    cards.forEach((el, i) =>
+      el.addEventListener('click', () => {
+        if (dragged) return;
+        if (i === active) openBox(el);
+        else go(i);
+      })
+    );
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') go(active - 1);
+      if (e.key === 'ArrowRight') go(active + 1);
+    });
+
+    // Deslizar con el dedo o el mouse
+    let startX = 0;
+    let down = false;
+    stage.addEventListener('pointerdown', (e) => {
+      down = true;
+      startX = e.clientX;
+    });
+    window.addEventListener('pointerup', (e) => {
+      if (!down) return;
+      down = false;
+      const dx = e.clientX - startX;
+      dragged = Math.abs(dx) > 10;
+      setTimeout(() => (dragged = false), 0);
+      if (Math.abs(dx) > 50) go(active + (dx < 0 ? 1 : -1));
+    });
+
+    // Giro automático (se pausa al interactuar o fuera de pantalla)
+    let paused = false;
+    let visible = false;
+    if (!reduced) {
+      setInterval(() => {
+        if (!paused && visible && !document.hidden) go(active + 1);
+      }, 3800);
+    }
+    root.addEventListener('pointerenter', () => (paused = true));
+    root.addEventListener('pointerleave', () => (paused = false));
+    root.addEventListener('focusin', () => (paused = true));
+    root.addEventListener('focusout', () => (paused = false));
+    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(root);
+
+    new ResizeObserver(render).observe(stage);
+    render();
+  }
+</script>

@@ -1,0 +1,84 @@
+---
+import FluxLines from '@/components/flux-lines/FluxLines';
+import { promotions } from '@/data/promotions';
+import { whatsappUrl } from '@/data/contact';
+---
+
+<section
+  id="promociones"
+  aria-labelledby="promociones-title"
+  class="relative isolate select-none overflow-hidden border-t border-brass/30 bg-night px-6 py-24 font-sans text-cream lg:px-10 lg:py-32"
+>
+  <div class="absolute inset-0 -z-10 opacity-60">
+    <FluxLines
+      client:visible
+      colors={['#a8834a', '#a8834a', '#a8834a']}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+    />
+  </div>
+
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Encabezado -->
+    <header class="text-center">
+      <p class="text-base font-semibold uppercase tracking-[0.12em] sm:text-lg text-brass-light">Paquetes</p>
+      <h2
+        id="promociones-title"
+        class="mt-4 text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl lg:text-6xl"
+      >
+        Promociones
+      </h2>
+      <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+        <span class="h-2 w-2 rotate-45 bg-brass"></span>
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+      </div>
+    </header>
+
+    <!-- Paquetes -->
+    <ul class="mt-16 grid items-stretch gap-6 md:grid-cols-3">
+      {
+        promotions.map((p) => (
+          <li
+            class:list={[
+              'flex flex-col rounded-lg border bg-[#0e0e0e] p-8 transition-colors hover:border-brass-light',
+              p.featured ? 'border-brass' : 'border-brass/30',
+            ]}
+          >
+            <h3 class="text-lg font-semibold uppercase tracking-[0.06em] text-brass-light sm:text-xl">{p.name}</h3>
+            <p class="mt-4 flex items-baseline gap-2">
+              <span class="text-lg font-medium text-brass">S/</span>
+              <span class="text-6xl font-semibold leading-none">{p.price}</span>
+            </p>
+            <span class="my-6 h-px w-full bg-brass/30" aria-hidden="true" />
+            <ul class="mb-8 space-y-3 text-base sm:text-lg">
+              {p.includes.map((item) => (
+                <li class="flex gap-3 text-cream/85">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-brass" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href={whatsappUrl(`Hola, quiero la promoción ${p.name}`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class:list={[
+                'inline-flex min-h-14 items-center justify-center rounded border px-6 font-sans text-base font-semibold uppercase tracking-[0.06em] transition-colors',
+                p.featured
+                  ? 'mt-auto border-brass bg-brass text-night hover:bg-brass-light'
+                  : 'mt-auto border-brass text-brass-light hover:bg-brass hover:text-night',
+              ]}
+            >
+              Reservar
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
