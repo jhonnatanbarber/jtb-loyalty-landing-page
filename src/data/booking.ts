@@ -185,17 +185,16 @@ export interface BookingData {
 
 export const buildMessage = (d: BookingData): string =>
   [
-    '*Reserva de cita*',
+    `Hola, soy *${d.name}* y quiero agendar mi cita en Jhonnatan The Barber. Estos son los datos de mi reserva:`,
     '',
     `*Barbero:* ${d.barber}`,
     `*Fecha:* ${formatDateEs(d.date)}`,
     `*Hora:* ${d.time}`,
-    d.service ? `*Servicio:* ${d.service}` : '',
-    `*Nombre:* ${d.name}`,
-    `*Teléfono:* ${d.phone}`,
-  ]
-    .filter((l, i, arr) => l !== '' || (i > 0 && arr[i - 1] !== ''))
-    .join('\n');
+    `*Servicio:* ${d.service || 'Lo decido en la barbería'}`,
+    `*Mi teléfono:* ${d.phone}`,
+    '',
+    'Quedo atento a su confirmación. ¡Gracias!',
+  ].join('\n');
 
 export const bookingUrl = (text: string): string => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 

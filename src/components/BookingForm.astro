@@ -66,22 +66,22 @@ const steps = [
     </section>
 
     <!-- PASO 2: fecha, hora y datos -->
-    <section data-step="2" hidden class="mx-auto max-w-3xl">
-      <div class="grid gap-6 rounded-lg border-2 border-brass-light bg-night/90 p-6 sm:grid-cols-2 sm:p-10">
+    <section data-step="2" hidden class="mx-auto w-full min-w-0 max-w-3xl">
+      <div class="grid grid-cols-[minmax(0,1fr)] gap-6 rounded-lg border-2 border-brass-light bg-night/90 p-5 sm:grid-cols-2 sm:p-10">
         <!-- Barbero elegido -->
         <div class="flex items-center gap-4 rounded-lg border border-brass/50 bg-[#0e0e0e] p-3 sm:col-span-2">
           <span
             data-selected-photo
-            class="flex h-20 w-16 shrink-0 items-center justify-center overflow-hidden rounded bg-night text-brass/70"
+            class="flex h-16 w-12 sm:h-20 sm:w-16 shrink-0 items-center justify-center overflow-hidden rounded bg-night text-brass/70"
           ></span>
           <div class="min-w-0 flex-1">
             <p class="text-sm font-semibold uppercase tracking-[0.12em] text-brass-light">Tu barbero</p>
-            <p data-selected-name class="text-xl font-semibold sm:text-2xl"></p>
+            <p data-selected-name class="text-lg font-semibold leading-tight sm:text-2xl"></p>
           </div>
           <button
             type="button"
             data-change
-            class="inline-flex min-h-11 items-center rounded border border-brass-light px-4 text-base font-semibold text-gold transition-colors hover:bg-brass-light hover:text-night"
+            class="inline-flex min-h-11 items-center rounded border border-brass-light px-3 text-sm sm:px-4 sm:text-base font-semibold text-gold transition-colors hover:bg-brass-light hover:text-night"
           >
             Cambiar
           </button>
@@ -97,7 +97,7 @@ const steps = [
         </div>
 
         <!-- Fecha: días en tarjetas -->
-        <fieldset class="sm:col-span-2">
+        <fieldset class="min-w-0 sm:col-span-2">
           <legend class="text-lg font-semibold text-cream sm:text-xl">
             ¿Qué día vienes? <span class="text-gold" aria-hidden="true">*</span>
           </legend>
@@ -106,7 +106,7 @@ const steps = [
         </fieldset>
 
         <!-- Hora: listado por franjas -->
-        <fieldset class="sm:col-span-2">
+        <fieldset class="min-w-0 sm:col-span-2">
           <legend class="text-lg font-semibold text-cream sm:text-xl">
             ¿A qué hora? <span class="text-gold" aria-hidden="true">*</span>
           </legend>
