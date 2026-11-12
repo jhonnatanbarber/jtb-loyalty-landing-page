@@ -1,0 +1,91 @@
+---
+import { Image } from 'astro:assets';
+import type { TeamMember } from '@/data/team';
+
+interface Props {
+  member: TeamMember;
+  /** "lg" para el dueño, "md" para el resto del equipo. */
+  size?: 'lg' | 'md';
+  /** Texto de la píldora en la esquina de la foto. */
+  badge?: string;
+}
+const { member: m, size = 'md', badge } = Astro.props;
+const big = size === 'lg';
+
+// Las fotos se cargan por nombre desde src/assets/team/. Si falta, se muestra un marcador.
+const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/team/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+});
+const key = Object.keys(photos).find((p) => p.split('/').pop()?.replace(/\.[^.]+$/, '') === m.photo);
+const photo = key ? photos[key].default : undefined;
+---
+
+<div class="group">
+  <div class="relative">
+    <!-- Marco desplazado -->
+    <span
+      class="absolute -bottom-3 -right-3 hidden h-full w-full rounded-lg border-2 border-brass transition-all duration-300 group-hover:-bottom-4 group-hover:-right-4 group-hover:border-gold sm:block"
+      aria-hidden="true"></span>
+
+    <div
+      class:list={[
+        'relative aspect-[3/4] overflow-hidden rounded-lg bg-[#0e0e0e] transition-colors duration-300 group-hover:border-gold',
+        big ? 'border-4 border-gold' : 'border-[3px] border-brass-light',
+      ]}
+    >
+      {
+        photo ? (
+          <Image
+            src={photo}
+            alt={`${m.name}, ${m.role.toLowerCase()} de Jhonnatan The Barber`}
+            widths={big ? [560, 800, 1100] : [420, 640, 900]}
+            sizes={big ? '(min-width: 640px) 360px, 90vw' : '(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw'}
+            loading="lazy"
+            draggable="false"
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div class="flex h-full w-full flex-col items-center justify-center gap-4 text-brass/70">
+            <svg
+              viewBox="0 0 24 24"
+              class:list={[big ? 'h-36 w-36' : 'h-32 w-32']}
+              fill="none"
+              stroke="currentColor"
+              stroke-width="0.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+            </svg>
+            <span class="text-sm font-medium uppercase tracking-[0.12em]">Foto próximamente</span>
+          </div>
+        )
+      }
+
+      {
+        badge && (
+          <span class="absolute left-4 top-4 rounded-full bg-night px-3 py-1 text-sm font-semibold text-gold sm:text-base">
+            {badge}
+          </span>
+        )
+      }
+    </div>
+  </div>
+
+  <!-- Placa con el nombre -->
+  <div
+    class:list={[
+      'relative mt-6 rounded-lg bg-gold px-4 text-center text-night transition-colors duration-300 group-hover:bg-cream',
+      big ? 'py-5' : 'py-4',
+    ]}
+  >
+    <h3 class:list={['font-semibold leading-tight', big ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl']}>
+      {m.name}
+    </h3>
+    <p class:list={['mt-1 font-semibold uppercase tracking-[0.14em]', big ? 'text-base sm:text-lg' : 'text-sm sm:text-base']}>
+      {m.role}
+    </p>
+  </div>
+</div>

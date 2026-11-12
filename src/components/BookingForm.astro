@@ -1,0 +1,644 @@
+---
+import BarberPicker from '@/components/BarberPicker.astro';
+
+const control =
+  'mt-2 block w-full min-h-12 rounded border border-brass/60 bg-[#0e0e0e] px-4 py-3 font-sans text-base text-cream placeholder:text-cream/40 transition-colors focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40 disabled:cursor-not-allowed disabled:opacity-50 sm:text-lg';
+const label = 'text-base font-semibold text-cream sm:text-lg';
+const steps = [
+  { n: 1, text: 'Elige tu barbero' },
+  { n: 2, text: 'Fecha y datos' },
+];
+---
+
+<div data-wizard>
+  <!-- Línea de tiempo de pasos -->
+  <ol data-stepper class="mx-auto flex max-w-xl items-start" aria-label="Pasos de la reserva">
+    {
+      steps.map((s, i) => (
+        <>
+          <li class="flex w-28 shrink-0 flex-col items-center text-center sm:w-36">
+            <button
+              type="button"
+              data-step-btn={s.n}
+              class="flex h-14 w-14 items-center justify-center rounded-full border-4 border-brass text-xl font-semibold text-brass-light transition-colors data-[state=active]:border-gold data-[state=active]:bg-gold data-[state=active]:text-night data-[state=done]:border-gold data-[state=done]:bg-night data-[state=done]:text-gold"
+              data-state={i === 0 ? 'active' : 'idle'}
+              aria-current={i === 0 ? 'step' : undefined}
+            >
+              <span data-step-num>{s.n}</span>
+            </button>
+            <span class="mt-3 text-base font-semibold text-cream/90 sm:text-lg">{s.text}</span>
+          </li>
+          {i < steps.length - 1 && (
+            <li aria-hidden="true" class="mt-7 h-1 flex-1 rounded bg-brass/40">
+              <span data-progress class="block h-full w-0 rounded bg-gold transition-all duration-500" />
+            </li>
+          )}
+        </>
+      ))
+    }
+  </ol>
+
+  <form data-booking-form novalidate class="mt-12">
+    <!-- PASO 1: barbero -->
+    <section data-step="1">
+      <h2 class="text-center text-3xl font-semibold uppercase tracking-[0.04em] sm:text-4xl">
+        ¿Con quién quieres cortarte?
+      </h2>
+      <p class="mx-auto mt-3 max-w-xl text-center text-lg text-cream/75 sm:text-xl">
+        Toca la foto del barbero que prefieras.
+      </p>
+
+      <div class="mt-8">
+        <BarberPicker />
+      </div>
+
+      <div class="mt-10 text-center">
+        <p data-error-1 role="alert" class="mb-4 hidden text-base font-semibold text-[#ff8a80] sm:text-lg"></p>
+        <button
+          type="button"
+          data-next
+          class="inline-flex min-h-16 w-full items-center justify-center gap-3 rounded bg-gold px-12 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream sm:w-auto"
+        >
+          Continuar
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- PASO 2: fecha, hora y datos -->
+    <section data-step="2" hidden class="mx-auto max-w-3xl">
+      <div class="grid gap-6 rounded-lg border-2 border-brass-light bg-night/90 p-6 sm:grid-cols-2 sm:p-10">
+        <!-- Barbero elegido -->
+        <div class="flex items-center gap-4 rounded-lg border border-brass/50 bg-[#0e0e0e] p-3 sm:col-span-2">
+          <span
+            data-selected-photo
+            class="flex h-20 w-16 shrink-0 items-center justify-center overflow-hidden rounded bg-night text-brass/70"
+          ></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold uppercase tracking-[0.12em] text-brass-light">Tu barbero</p>
+            <p data-selected-name class="text-xl font-semibold sm:text-2xl"></p>
+          </div>
+          <button
+            type="button"
+            data-change
+            class="inline-flex min-h-11 items-center rounded border border-brass-light px-4 text-base font-semibold text-gold transition-colors hover:bg-brass-light hover:text-night"
+          >
+            Cambiar
+          </button>
+        </div>
+
+        <!-- Servicio: define cuánto tiempo se reserva -->
+        <div class="sm:col-span-2">
+          <label for="bk-service" class="text-lg font-semibold text-cream sm:text-xl">
+            ¿Qué te vas a hacer? (opcional)
+          </label>
+          <select id="bk-service" name="service" class={control}></select>
+          <p data-duration class="mt-3 text-base text-cream/75 sm:text-lg"></p>
+        </div>
+
+        <!-- Fecha: días en tarjetas -->
+        <fieldset class="sm:col-span-2">
+          <legend class="text-lg font-semibold text-cream sm:text-xl">
+            ¿Qué día vienes? <span class="text-gold" aria-hidden="true">*</span>
+          </legend>
+          <input type="hidden" name="date" />
+          <div data-dates class="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-7 sm:gap-3"></div>
+        </fieldset>
+
+        <!-- Hora: listado por franjas -->
+        <fieldset class="sm:col-span-2">
+          <legend class="text-lg font-semibold text-cream sm:text-xl">
+            ¿A qué hora? <span class="text-gold" aria-hidden="true">*</span>
+          </legend>
+          <input type="hidden" name="time" />
+          <p data-slots-hint class="mt-3 text-base text-cream/70 sm:text-lg">
+            Primero elige el día para ver los horarios del barbero.
+          </p>
+          <div data-slots class="mt-4 space-y-6"></div>
+          <p
+            data-slots-legend
+            class="mt-5 hidden flex-wrap items-center gap-x-6 gap-y-2 text-sm text-cream/75 sm:text-base"
+          >
+            <span class="inline-flex items-center gap-2"
+              ><span class="h-4 w-4 rounded-sm border-2 border-brass-light"></span>Libre</span
+            >
+            <span class="inline-flex items-center gap-2"
+              ><span class="h-4 w-4 rounded-sm border-2 border-dashed border-cream/30"></span>Ocupado</span
+            >
+            <span class="inline-flex items-center gap-2"
+              ><span class="h-4 w-4 rounded-sm bg-gold"></span>Tu elección</span
+            >
+          </p>
+          <p data-chosen role="status" class="mt-4 text-base font-semibold text-gold sm:text-lg"></p>
+        </fieldset>
+
+        <div>
+          <label for="bk-name" class={label}>Nombres <span class="text-gold" aria-hidden="true">*</span></label>
+          <input
+            id="bk-name"
+            name="name"
+            type="text"
+            required
+            placeholder="Tus nombres y apellidos"
+            autocomplete="name"
+            class={control}
+          />
+        </div>
+
+        <div>
+          <label for="bk-phone" class={label}>Número de teléfono <span class="text-gold" aria-hidden="true">*</span></label>
+          <input
+            id="bk-phone"
+            name="phone"
+            type="tel"
+            required
+            placeholder="9XX XXX XXX"
+            autocomplete="tel"
+            class={control}
+          />
+        </div>
+
+        <div class="sm:col-span-2">
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              data-back
+              class="inline-flex min-h-16 items-center justify-center rounded border-2 border-brass-light px-8 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:bg-brass-light hover:text-night"
+            >
+              ← Volver
+            </button>
+            <button
+              type="submit"
+              class="inline-flex min-h-16 flex-1 items-center justify-center rounded bg-gold px-10 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream sm:flex-none"
+            >
+              Enviar reserva
+            </button>
+          </div>
+          <p data-booking-error role="alert" class="mt-4 hidden text-base font-semibold text-[#ff8a80] sm:text-lg"></p>
+          <p data-status role="status" class="mt-4 text-sm text-cream/60 sm:text-base">
+            Al enviar, la barbería recibirá tu reserva y te contactará para confirmarla. Los campos con * son
+            obligatorios.
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- PASO 3: confirmación -->
+    <section data-step="3" hidden class="mx-auto max-w-2xl text-center">
+      <div
+        class="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-[#22c55e] text-white shadow-[0_0_0_10px_rgba(34,197,94,0.2)] motion-safe:animate-[pop_0.5s_ease-out]"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="h-16 w-16" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.5l4.5 4.5L19 7.5" />
+        </svg>
+      </div>
+
+      <h2 data-done-title class="mt-8 text-3xl font-semibold uppercase tracking-[0.04em] sm:text-4xl">
+        ¡Reserva recibida!
+      </h2>
+      <p data-done-text class="mx-auto mt-3 max-w-xl text-lg text-cream/80 sm:text-xl">
+        Registramos tu solicitud. Te contactaremos al número que nos diste para confirmar tu cita.
+      </p>
+
+      <div class="mt-10 rounded-lg border-2 border-[#22c55e]/70 bg-night/90 p-6 text-left sm:p-8">
+        <p class="text-sm font-semibold uppercase tracking-[0.12em] text-[#4ade80] sm:text-base">Resumen de tu reserva</p>
+
+        <div class="mt-5 flex items-center gap-4 border-b border-brass/30 pb-5">
+          <span
+            data-done-photo
+            class="flex h-24 w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded bg-[#0e0e0e] text-brass/70"
+          ></span>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold uppercase tracking-[0.12em] text-brass-light">Tu barbero</p>
+            <p data-done-barber class="text-2xl font-semibold sm:text-3xl"></p>
+          </div>
+        </div>
+
+        <dl class="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-semibold uppercase tracking-[0.1em] text-brass-light">Fecha</dt>
+            <dd data-done-date class="mt-1 text-lg font-semibold first-letter:uppercase sm:text-xl"></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-semibold uppercase tracking-[0.1em] text-brass-light">Hora</dt>
+            <dd data-done-time class="mt-1 text-lg font-semibold sm:text-xl"></dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-semibold uppercase tracking-[0.1em] text-brass-light">Servicio</dt>
+            <dd data-done-service class="mt-1 text-lg font-semibold sm:text-xl"></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-semibold uppercase tracking-[0.1em] text-brass-light">A nombre de</dt>
+            <dd data-done-name class="mt-1 text-lg font-semibold sm:text-xl"></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-semibold uppercase tracking-[0.1em] text-brass-light">Teléfono</dt>
+            <dd data-done-phone class="mt-1 text-lg font-semibold sm:text-xl"></dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Plan B (sin API): hay que enviar el mensaje por WhatsApp -->
+      <div
+        data-done-fallback
+        hidden
+        class="mt-6 rounded-lg border-2 border-dashed border-gold bg-night/90 p-5 text-left text-base text-cream/90 sm:text-lg"
+      >
+        <p>
+          <strong class="text-gold">¿No se abrió WhatsApp?</strong> No te preocupes, inténtalo nuevamente con el
+          botón de abajo.
+        </p>
+        <button
+          type="button"
+          data-done-reopen
+          class="mt-4 inline-flex min-h-12 items-center rounded border-2 border-brass-light px-6 text-base font-semibold text-gold transition-colors hover:bg-brass-light hover:text-night"
+        >
+          Intentar nuevamente
+        </button>
+      </div>
+
+      <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+        <a
+          href="/"
+          class="inline-flex min-h-16 items-center justify-center rounded bg-gold px-10 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream"
+        >
+          Volver al inicio
+        </a>
+        <button
+          type="button"
+          data-done-again
+          class="inline-flex min-h-16 items-center justify-center rounded border-2 border-brass-light px-8 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:bg-brass-light hover:text-night"
+        >
+          Hacer otra reserva
+        </button>
+      </div>
+    </section>
+  </form>
+</div>
+
+<style is:global>
+  select option:disabled {
+    color: #777;
+  }
+</style>
+
+<script>
+  import {
+    barbers,
+    allSlots,
+    toISODate,
+    formatDateEs,
+    getBusy,
+    isSlotFree,
+    serviceMinutes,
+    formatDuration,
+    serviceGroups,
+    buildMessage,
+    bookingUrl,
+    BOOKING_API,
+    CALLMEBOT_APIKEY,
+    submitBooking,
+    sendViaCallMeBot,
+    DAYS_AHEAD,
+  } from '@/data/booking';
+
+  const wizard = document.querySelector<HTMLElement>('[data-wizard]');
+  const form = document.querySelector<HTMLFormElement>('[data-booking-form]');
+  if (wizard && form) {
+    const dateEl = form.elements.namedItem('date') as HTMLInputElement;
+    const timeEl = form.elements.namedItem('time') as HTMLInputElement;
+    const serviceEl = form.elements.namedItem('service') as HTMLSelectElement;
+    const durationEl = form.querySelector<HTMLElement>('[data-duration]')!;
+    const datesEl = form.querySelector<HTMLElement>('[data-dates]')!;
+    const slotsEl = form.querySelector<HTMLElement>('[data-slots]')!;
+    const hintEl = form.querySelector<HTMLElement>('[data-slots-hint]')!;
+    const legendEl = form.querySelector<HTMLElement>('[data-slots-legend]')!;
+    const chosenEl = form.querySelector<HTMLElement>('[data-chosen]')!;
+    const errorEl = form.querySelector<HTMLElement>('[data-booking-error]')!;
+    const error1 = form.querySelector<HTMLElement>('[data-error-1]')!;
+    const stepEls = [...form.querySelectorAll<HTMLElement>('[data-step]')];
+    const stepBtns = [...wizard.querySelectorAll<HTMLButtonElement>('[data-step-btn]')];
+    const progress = wizard.querySelector<HTMLElement>('[data-progress]')!;
+    let reqId = 0;
+
+    const getBarber = () => form.querySelector<HTMLInputElement>('input[name="barber"]:checked');
+
+    // --- Servicios y fechas --------------------------------------------------
+    serviceEl.innerHTML = '<option value="">Lo decido en la barbería</option>';
+    serviceGroups().forEach(({ group, items }) => {
+      const og = document.createElement('optgroup');
+      og.label = group;
+      items.forEach((name) => {
+        const o = document.createElement('option');
+        o.value = name;
+        o.textContent = name;
+        og.appendChild(o);
+      });
+      serviceEl.appendChild(og);
+    });
+
+
+    // Si se llegó desde una promoción (?promo=Nombre), ya viene seleccionada.
+    const promo = new URLSearchParams(location.search).get('promo');
+    if (promo && [...serviceEl.options].some((o) => o.value === promo)) serviceEl.value = promo;
+
+    /** Minutos que dura lo elegido (un corte por defecto). */
+    const minutes = () => serviceMinutes(serviceEl.value || undefined);
+    const renderDuration = () => {
+      durationEl.textContent = `Tu cita durará aprox. ${formatDuration(minutes())}; reservaremos ese tiempo en la agenda.`;
+    };
+    renderDuration();
+
+    // --- Pasos ---------------------------------------------------------------
+    const goTo = (n: 1 | 2 | 3) => {
+      stepEls.forEach((el) => (el.hidden = Number(el.dataset.step) !== n));
+      stepBtns.forEach((b, i) => {
+        const step = i + 1;
+        const state = step === n ? 'active' : step < n ? 'done' : 'idle';
+        b.dataset.state = state;
+        if (step === n) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+        const num = b.querySelector<HTMLElement>('[data-step-num]')!;
+        num.textContent = state === 'done' ? '✓' : String(step);
+      });
+      progress.style.width = n >= 2 ? '100%' : '0%';
+      wizard.querySelector<HTMLElement>('[data-stepper]')!.hidden = n === 3;
+      wizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const fillSelected = () => {
+      const input = getBarber();
+      if (!input) return;
+      const label = input.closest('label');
+      const img = label?.querySelector('img');
+      const slot = form.querySelector<HTMLElement>('[data-selected-photo]')!;
+      slot.innerHTML = '';
+      if (img) {
+        const clone = document.createElement('img');
+        clone.src = img.currentSrc || img.src;
+        clone.alt = '';
+        clone.className = 'h-full w-full object-cover';
+        slot.appendChild(clone);
+      } else {
+        slot.innerHTML =
+          '<svg viewBox="0 0 24 24" class="h-12 w-12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>';
+      }
+      form.querySelector<HTMLElement>('[data-selected-name]')!.textContent =
+        `${input.dataset.name} · ${input.dataset.role}`;
+    };
+
+    form.querySelector('[data-next]')?.addEventListener('click', () => {
+      if (!getBarber()) {
+        error1.textContent = 'Toca la foto del barbero que quieres para continuar.';
+        error1.classList.remove('hidden');
+        return;
+      }
+      error1.classList.add('hidden');
+      fillSelected();
+      goTo(2);
+      loadTimes();
+    });
+    form.querySelector('[data-back]')?.addEventListener('click', () => goTo(1));
+    form.querySelector('[data-change]')?.addEventListener('click', () => goTo(1));
+    stepBtns[0].addEventListener('click', () => goTo(1));
+    stepBtns[1].addEventListener('click', () => form.querySelector<HTMLButtonElement>('[data-next]')?.click());
+    form.addEventListener('change', (e) => {
+      if ((e.target as HTMLInputElement).name === 'barber') {
+        error1.classList.add('hidden');
+        timeEl.value = ''; // la hora elegida puede no estar libre con otro barbero
+      }
+    });
+
+    // --- Selector de día (tarjetas) -------------------------------------------
+    const btnBase = 'rounded-lg border-2 px-2 py-3 font-sans transition-colors ';
+    const btnOn = 'border-gold bg-gold text-night ';
+    const btnOff = 'border-brass-light text-gold hover:bg-brass hover:text-night ';
+
+    const renderDates = () => {
+      datesEl.innerHTML = '';
+      const base = new Date();
+      for (let i = 0; i < DAYS_AHEAD; i++) {
+        const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+        const iso = toISODate(d);
+        const top =
+          i === 0 ? 'Hoy' : i === 1 ? 'Mañana' : d.toLocaleDateString('es-PE', { weekday: 'short' }).replace('.', '');
+        const month = d.toLocaleDateString('es-PE', { month: 'short' }).replace('.', '');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-pressed', String(dateEl.value === iso));
+        btn.setAttribute('aria-label', formatDateEs(iso));
+        btn.className = btnBase + 'flex flex-col items-center ' + (dateEl.value === iso ? btnOn : btnOff);
+        btn.innerHTML = `<span class="text-xs font-semibold uppercase tracking-[0.06em] sm:text-sm">${top}</span><span class="text-3xl font-semibold leading-none sm:text-4xl">${d.getDate()}</span><span class="text-xs font-medium uppercase sm:text-sm">${month}</span>`;
+        btn.addEventListener('click', () => {
+          dateEl.value = iso;
+          timeEl.value = '';
+          renderDates();
+          loadTimes();
+        });
+        datesEl.appendChild(btn);
+      }
+    };
+
+    // --- Horas con disponibilidad (listado por franjas) -----------------------
+    const renderChosen = () => {
+      chosenEl.textContent =
+        dateEl.value && timeEl.value
+          ? `Elegiste: ${formatDateEs(dateEl.value)} a las ${timeEl.value} h.`
+          : '';
+    };
+
+    const loadTimes = async () => {
+      const barber = getBarber()?.value ?? '';
+      const date = dateEl.value;
+      slotsEl.innerHTML = '';
+      renderChosen();
+      if (!barber || !date) {
+        hintEl.textContent = 'Primero elige el día para ver los horarios del barbero.';
+        hintEl.classList.remove('hidden');
+        legendEl.classList.add('hidden');
+        legendEl.classList.remove('flex');
+        return;
+      }
+      const id = ++reqId;
+      hintEl.textContent = 'Consultando disponibilidad…';
+      hintEl.classList.remove('hidden');
+      legendEl.classList.add('hidden');
+      legendEl.classList.remove('flex');
+      const busy = await getBusy(barber, date);
+      if (id !== reqId) return; // llegó una consulta más nueva
+
+      const now = new Date();
+      const isToday = date === toISODate(now);
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const groups: { title: string; times: string[] }[] = [
+        { title: 'Mañana', times: [] },
+        { title: 'Tarde', times: [] },
+        { title: 'Noche', times: [] },
+      ];
+      allSlots().forEach((t) => {
+        const h = Number(t.slice(0, 2));
+        groups[h < 12 ? 0 : h < 18 ? 1 : 2].times.push(t);
+      });
+
+      const dur = minutes();
+      let free = 0;
+      groups
+        .filter((g) => g.times.length)
+        .forEach((g) => {
+          const wrap = document.createElement('div');
+          wrap.innerHTML = `<p class="text-sm font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-base">${g.title}</p>`;
+          const grid = document.createElement('div');
+          grid.className = 'mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4';
+          g.times.forEach((t) => {
+            const past = isToday && Number(t.slice(0, 2)) * 60 + Number(t.slice(3)) <= nowMin;
+            const isBusy = !isSlotFree(t, dur, busy);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            if (isBusy || past) {
+              btn.disabled = true;
+              btn.className =
+                btnBase + 'cursor-not-allowed border-dashed border-cream/25 text-cream/35 ';
+              btn.innerHTML = `<span class="block text-2xl font-semibold line-through">${t}</span><span class="block text-sm uppercase">${isBusy ? 'Ocupado' : 'Ya pasó'}</span>`;
+              btn.setAttribute('aria-label', `${t}, no disponible`);
+            } else {
+              free++;
+              const picked = timeEl.value === t;
+              btn.setAttribute('aria-pressed', String(picked));
+              btn.className = btnBase + (picked ? btnOn : btnOff);
+              btn.innerHTML = `<span class="block text-2xl font-semibold">${t}</span><span class="block text-sm uppercase">${picked ? 'Elegida' : 'Libre'}</span>`;
+              btn.addEventListener('click', () => {
+                timeEl.value = t;
+                grid.closest('[data-slots]')?.querySelectorAll('button').forEach((b) => {
+                  if (b.disabled) return;
+                  const on = b === btn;
+                  b.setAttribute('aria-pressed', String(on));
+                  b.className = btnBase + (on ? btnOn : btnOff);
+                  const lbl = b.querySelector('span:last-child');
+                  if (lbl) lbl.textContent = on ? 'Elegida' : 'Libre';
+                });
+                renderChosen();
+              });
+            }
+            grid.appendChild(btn);
+          });
+          wrap.appendChild(grid);
+          slotsEl.appendChild(wrap);
+        });
+
+      if (free) {
+        hintEl.classList.add('hidden');
+        legendEl.classList.remove('hidden');
+        legendEl.classList.add('flex');
+      } else {
+        hintEl.textContent = 'No quedan horas libres ese día. Prueba con otro día u otro barbero.';
+        hintEl.classList.remove('hidden');
+      }
+    };
+
+    serviceEl.addEventListener('change', () => {
+      renderDuration();
+      timeEl.value = ''; // la hora elegida puede ya no alcanzar con otra duración
+      loadTimes();
+    });
+
+    renderDates();
+
+    // --- Confirmación --------------------------------------------------------
+    const setText = (sel: string, value: string) => {
+      const el = form.querySelector<HTMLElement>(sel);
+      if (el) el.textContent = value;
+    };
+    let lastWhatsApp = '';
+
+    const showDone = (d: { barberName: string; role: string; date: string; time: string; service?: string; name: string; phone: string }, viaWhatsApp: boolean) => {
+      setText('[data-done-barber]', `${d.barberName}${d.role ? ' · ' + d.role : ''}`);
+      setText('[data-done-date]', formatDateEs(d.date));
+      setText('[data-done-time]', `${d.time} h`);
+      setText('[data-done-service]', d.service || 'Lo decido en la barbería');
+      setText('[data-done-name]', d.name);
+      setText('[data-done-phone]', d.phone);
+
+      const photoSlot = form.querySelector<HTMLElement>('[data-done-photo]')!;
+      photoSlot.innerHTML = form.querySelector<HTMLElement>('[data-selected-photo]')?.innerHTML ?? '';
+      photoSlot.querySelector('img')?.classList.add('h-full', 'w-full', 'object-cover');
+
+      const fallback = form.querySelector<HTMLElement>('[data-done-fallback]')!;
+      fallback.hidden = !viaWhatsApp;
+      goTo(3);
+    };
+
+    form.querySelector('[data-done-reopen]')?.addEventListener('click', () => {
+      if (lastWhatsApp) window.open(lastWhatsApp, '_blank', 'noopener');
+    });
+    form.querySelector('[data-done-again]')?.addEventListener('click', () => {
+      form.reset();
+      dateEl.value = '';
+      timeEl.value = '';
+      chosenEl.textContent = '';
+      renderDuration();
+      renderDates();
+      loadTimes();
+      goTo(1);
+    });
+
+    // --- Envío ---------------------------------------------------------------
+    const showError = (msg: string) => {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const barberInput = getBarber();
+      const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
+      const phone = (form.elements.namedItem('phone') as HTMLInputElement).value.trim();
+      if (!barberInput) return goTo(1);
+      if (!dateEl.value) return showError('Elige la fecha de tu cita.');
+      if (!timeEl.value) return showError('Elige una hora disponible.');
+      if (!name) return showError('Escribe tus nombres.');
+      if (!phone) return showError('Escribe tu número de teléfono.');
+      errorEl.classList.add('hidden');
+
+      const barber = barbers.find((b) => b.id === barberInput.value);
+      const data = {
+        barber: barber?.name ?? barberInput.value,
+        date: dateEl.value,
+        time: timeEl.value,
+        minutes: minutes(),
+        service: serviceEl.value || undefined,
+        name,
+        phone,
+      };
+      const summary = {
+        barberName: data.barber,
+        role: barber?.role ?? '',
+        date: data.date,
+        time: data.time,
+        service: data.service,
+        name,
+        phone,
+      };
+
+      if (BOOKING_API || CALLMEBOT_APIKEY) {
+        // La reserva se envía en segundo plano (API o CallMeBot); el cliente solo ve la confirmación.
+        const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+        const label = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando…';
+        const ok = BOOKING_API
+          ? await submitBooking({ ...data, barberId: barberInput.value })
+          : await sendViaCallMeBot(buildMessage(data));
+        submitBtn.disabled = false;
+        submitBtn.textContent = label;
+        if (!ok) return showError('No pudimos registrar tu reserva. Revisa tu conexión e inténtalo de nuevo.');
+        showDone(summary, false);
+        return;
+      }
+
+      // Plan B (aún sin API): se abre WhatsApp hacia el número del dueño.
+      lastWhatsApp = bookingUrl(buildMessage(data));
+      window.open(lastWhatsApp, '_blank', 'noopener');
+      showDone(summary, true);
+    });
+  }
+</script>

@@ -1,0 +1,62 @@
+---
+import FluxLines from '@/components/flux-lines/FluxLines';
+import TeamCard from '@/components/TeamCard.astro';
+import { owner, team } from '@/data/team';
+---
+
+<section
+  id="nosotros"
+  aria-labelledby="nosotros-title"
+  class="relative isolate select-none overflow-hidden border-t border-brass/30 bg-night px-6 py-24 font-sans text-cream lg:px-10 lg:py-32"
+>
+  <div class="absolute inset-0 -z-10 opacity-60">
+    <FluxLines
+      client:visible
+      colors={['#a8834a', '#a8834a', '#a8834a']}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+    />
+  </div>
+
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Encabezado -->
+    <header class="text-center">
+      <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-xl">Nuestro equipo</p>
+      <h2
+        id="nosotros-title"
+        class="mt-4 text-5xl font-semibold uppercase tracking-[0.04em] sm:text-6xl lg:text-7xl"
+      >
+        Nosotros
+      </h2>
+      <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+        <span class="h-px w-16 bg-brass sm:w-32"></span>
+        <span class="h-2.5 w-2.5 rotate-45 bg-gold"></span>
+        <span class="h-px w-16 bg-brass sm:w-32"></span>
+      </div>
+      <p class="mx-auto mt-8 max-w-3xl text-xl text-cream/85 sm:text-2xl">
+        Barberos apasionados por su oficio. Desde 2015 trabajamos para que cada cliente salga con el{' '}
+        <span class="text-gold">estilo que buscaba</span>.
+      </p>
+    </header>
+
+    <!-- Dueño: solo, al centro y más grande -->
+    <div class="mx-auto mt-20 w-full max-w-[360px] px-3 sm:px-0">
+      <TeamCard member={owner} size="lg" badge="Fundador" />
+    </div>
+
+    <!-- Equipo: tres en una fila, tamaño mediano -->
+    <ul class="mx-auto mt-24 grid max-w-[1000px] gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        team.map((m, i) => (
+          <li>
+            <TeamCard member={m} badge={String(i + 1).padStart(2, '0')} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

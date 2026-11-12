@@ -23,3 +23,24 @@ body {
   height: 100%;
   margin: 0;
 }
+
+/* Los botones activos muestran la manita (pointer) */
+button:not(:disabled),
+summary,
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}

@@ -1,0 +1,93 @@
+---
+import { Image } from 'astro:assets';
+import { barbers } from '@/data/booking';
+
+// Las fotos se cargan por nombre desde src/assets/team/ (el id del barbero = nombre del archivo).
+const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/team/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+});
+const photoFor = (id: string) => {
+  const key = Object.keys(photos).find((p) => p.split('/').pop()?.replace(/\.[^.]+$/, '') === id);
+  return key ? photos[key].default : undefined;
+};
+---
+
+<fieldset>
+  <legend class="sr-only">Elige a tu barbero</legend>
+
+  <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+    {
+      barbers.map((b) => {
+        const photo = photoFor(b.id);
+        return (
+          <label class="group relative block cursor-pointer">
+            <input
+              type="radio"
+              name="barber"
+              value={b.id}
+              data-name={b.name}
+              data-role={b.role}
+              class="peer sr-only"
+            />
+
+            <div class="overflow-hidden rounded-xl border-[5px] border-brass/50 bg-[#0e0e0e] transition-all duration-200 group-hover:-translate-y-1 group-hover:border-brass-light peer-checked:border-gold peer-checked:shadow-[0_0_0_6px_rgba(240,204,120,0.25)] peer-focus-visible:ring-4 peer-focus-visible:ring-gold peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-black">
+              <div class="relative aspect-[3/4] overflow-hidden">
+                {photo ? (
+                  <Image
+                    src={photo}
+                    alt=""
+                    widths={[560, 840, 1100]}
+                    sizes="(min-width: 1024px) 420px, 45vw"
+                    loading="lazy"
+                    draggable="false"
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div class="flex h-full w-full flex-col items-center justify-center gap-3 text-brass/70">
+                    <svg
+                      viewBox="0 0 24 24"
+                      class="h-28 w-28 sm:h-32 sm:w-32"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="0.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+                    </svg>
+                    <span class="text-sm font-medium uppercase tracking-[0.1em]">Foto próximamente</span>
+                  </div>
+                )}
+
+                <!-- Marca de selección -->
+                <span
+                  data-check
+                  class="absolute right-3 top-3 hidden h-11 w-11 items-center justify-center rounded-full bg-gold text-night"
+                  aria-hidden="true"
+                >
+                  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                  </svg>
+                </span>
+              </div>
+
+              <div class="bg-gold px-3 py-5 text-center text-night transition-colors group-hover:bg-cream">
+                <p class="text-xl font-semibold leading-tight sm:text-3xl">{b.name}</p>
+                <p class="mt-1 text-sm font-semibold uppercase tracking-[0.12em] sm:text-lg">{b.role}</p>
+              </div>
+            </div>
+          </label>
+        );
+      })
+    }
+  </div>
+</fieldset>
+
+<style is:global>
+  /* La marca de selección solo se muestra con el barbero elegido */
+  input[name='barber']:checked ~ div [data-check] {
+    display: flex;
+  }
+</style>

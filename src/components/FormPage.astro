@@ -8,8 +8,10 @@ interface Props {
   eyebrow: string;
   heading: string;
   intro: string;
+  /** Contenido más ancho (ej. tarjetas de barberos). */
+  wide?: boolean;
 }
-const { title, eyebrow, heading, intro } = Astro.props;
+const { title, eyebrow, heading, intro, wide = false } = Astro.props;
 ---
 
 <BaseLayout title={`${title} | Jhonnatan The Barber`}>
@@ -36,7 +38,7 @@ const { title, eyebrow, heading, intro } = Astro.props;
       </a>
     </header>
 
-    <main class="mx-auto w-full max-w-3xl flex-1 px-6 py-16 lg:py-20">
+    <main class:list={['mx-auto w-full flex-1 py-16 lg:py-20', wide ? 'max-w-[1800px] px-4' : 'max-w-3xl px-6']}>
       <header class="text-center">
         <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">{eyebrow}</p>
         <h1 class="mt-4 text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl">{heading}</h1>

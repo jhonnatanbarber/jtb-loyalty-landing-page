@@ -24,5 +24,18 @@ const { title = 'Jhonnatan The Barber' } = Astro.props;
   </head>
   <body>
     <slot />
+
+    <script>
+      // Cualquier botón de reserva por WhatsApp lleva primero al formulario de reserva.
+      document.addEventListener('click', (e) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const a = (e.target as Element).closest<HTMLAnchorElement>('a[href*="wa.me"]');
+        if (!a) return;
+        e.preventDefault();
+        const text = new URL(a.href).searchParams.get('text') ?? '';
+        const promo = text.match(/promoci[óo]n\s+(.+)$/i)?.[1];
+        location.href = '/reservar' + (promo ? '?promo=' + encodeURIComponent(promo) : '');
+      });
+    </script>
   </body>
 </html>
