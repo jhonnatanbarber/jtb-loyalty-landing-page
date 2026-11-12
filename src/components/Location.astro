@@ -1,0 +1,112 @@
+---
+import FluxLines from '@/components/flux-lines/FluxLines';
+import { location, mapEmbedUrl } from '@/data/location';
+
+interface Props {
+  whatsapp: string;
+}
+const { whatsapp } = Astro.props;
+---
+
+<section
+  id="ubicacion"
+  aria-labelledby="ubicacion-title"
+  class="relative isolate overflow-hidden border-t border-brass/30 bg-night px-6 py-24 font-sans text-cream lg:px-10 lg:py-32"
+>
+  <div class="absolute inset-0 -z-10 opacity-60">
+    <FluxLines
+      client:visible
+      colors={['#a8834a', '#a8834a', '#a8834a']}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+    />
+  </div>
+
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Encabezado -->
+    <header class="text-center">
+      <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">Encuéntranos</p>
+      <h2
+        id="ubicacion-title"
+        class="mt-4 select-none text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl lg:text-6xl"
+      >
+        Ubicación
+      </h2>
+      <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+        <span class="h-2 w-2 rotate-45 bg-brass"></span>
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+      </div>
+    </header>
+
+    <div class="mt-16 grid items-stretch gap-8 lg:grid-cols-5">
+      <!-- Datos -->
+      <div class="flex flex-col rounded-lg border border-brass/40 bg-night/90 p-8 sm:p-10 lg:col-span-2">
+        <p class="text-sm font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-base">
+          {location.name}
+        </p>
+
+        <div class="mt-6 flex gap-4">
+          <svg viewBox="0 0 24 24" class="mt-1 h-8 w-8 shrink-0 text-gold" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" stroke-linejoin="round"></path>
+            <circle cx="12" cy="9.5" r="2.6"></circle>
+          </svg>
+          <address class="not-italic">
+            <p class="text-2xl font-semibold sm:text-3xl">{location.address}</p>
+            <p class="mt-2 text-lg text-cream/80 sm:text-xl">
+              {location.district} {location.postalCode}
+            </p>
+            <p class="text-lg text-cream/80 sm:text-xl">{location.city}, {location.country}</p>
+          </address>
+        </div>
+
+        <div class="mt-10 flex flex-col gap-4">
+          <a
+            href={location.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex min-h-16 items-center justify-center gap-3 rounded bg-gold px-8 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream"
+          >
+            Cómo llegar
+            <span aria-hidden="true">→</span>
+          </a>
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex min-h-16 items-center justify-center rounded border-2 border-brass-light px-8 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:bg-brass-light hover:text-night"
+          >
+            Reservar mi cita
+          </a>
+        </div>
+      </div>
+
+      <!-- Mapa -->
+      <div class="overflow-hidden rounded-lg border-2 border-brass-light lg:col-span-3">
+        <iframe
+          src={mapEmbedUrl}
+          title={`Mapa de ubicación de Jhonnatan The Barber, ${location.address}, ${location.district}`}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+          class="map-frame block h-[22rem] w-full border-0 sm:h-[26rem] lg:h-full lg:min-h-[28rem]"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Mapa en tono oscuro para integrarlo al diseño; recupera sus colores al pasar el mouse */
+  .map-frame {
+    filter: grayscale(1) invert(0.92) contrast(0.9);
+    transition: filter 0.4s;
+  }
+  .map-frame:hover {
+    filter: none;
+  }
+</style>

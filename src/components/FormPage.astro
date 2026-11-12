@@ -1,0 +1,58 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/Footer.astro';
+import FluxLines from '@/components/flux-lines/FluxLines';
+
+interface Props {
+  title: string;
+  eyebrow: string;
+  heading: string;
+  intro: string;
+}
+const { title, eyebrow, heading, intro } = Astro.props;
+---
+
+<BaseLayout title={`${title} | Jhonnatan The Barber`}>
+  <div class="relative isolate flex min-h-screen flex-col bg-night font-sans text-cream">
+    <div class="absolute inset-0 -z-10 opacity-60">
+      <FluxLines
+        client:idle
+        colors={['#a8834a', '#a8834a', '#a8834a']}
+        glow={2}
+        rimWidth={0.2}
+        lineWidth={1}
+        flowDirection="down"
+        mouseInteraction
+        clickSwirl
+      />
+    </div>
+
+    <header class="px-6 pt-6 lg:px-10">
+      <a
+        href="/"
+        class="inline-flex min-h-11 items-center gap-2 text-base font-semibold text-brass-light transition-colors hover:text-gold sm:text-lg"
+      >
+        <span aria-hidden="true">←</span> Volver al inicio
+      </a>
+    </header>
+
+    <main class="mx-auto w-full max-w-3xl flex-1 px-6 py-16 lg:py-20">
+      <header class="text-center">
+        <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">{eyebrow}</p>
+        <h1 class="mt-4 text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl">{heading}</h1>
+        <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+          <span class="h-px w-16 bg-brass sm:w-28"></span>
+          <span class="h-2 w-2 rotate-45 bg-brass"></span>
+          <span class="h-px w-16 bg-brass sm:w-28"></span>
+        </div>
+        <p class="mx-auto mt-8 max-w-2xl text-lg text-cream/80 sm:text-xl">{intro}</p>
+      </header>
+
+      <div class="mt-12">
+        <slot />
+      </div>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>

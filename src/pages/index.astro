@@ -5,7 +5,11 @@ import FluxLines from '@/components/flux-lines/FluxLines';
 import logo from '@/assets/logo-v2.png';
 import Services from '@/components/Services.astro';
 import Promotions from '@/components/Promotions.astro';
+import LoyaltyProgram from '@/components/LoyaltyProgram.astro';
 import Gallery from '@/components/Gallery.astro';
+import Location from '@/components/Location.astro';
+import Footer from '@/components/Footer.astro';
+import ScrollTop from '@/components/ScrollTop.astro';
 import { whatsappUrl } from '@/data/contact';
 
 const whatsapp = whatsappUrl();
@@ -96,5 +100,9 @@ const btn =
 
   <Services whatsapp={whatsapp} />
   <Promotions />
+  <LoyaltyProgram whatsapp={whatsapp} />
   <Gallery whatsapp={whatsapp} />
+  <Location whatsapp={whatsapp} />
+  <Footer />
+  <ScrollTop />
 </BaseLayout>

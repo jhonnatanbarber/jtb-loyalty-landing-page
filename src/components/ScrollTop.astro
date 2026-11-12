@@ -1,0 +1,23 @@
+<button
+  type="button"
+  data-scroll-top
+  aria-label="Volver al inicio de la página"
+  class="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 translate-y-4 items-center justify-center rounded-full border-2 border-brass-light bg-night text-gold opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,0.6)] transition-all duration-300 hover:bg-gold hover:text-night focus-visible:outline-2 pointer-events-none data-[visible=true]:pointer-events-auto data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100 sm:bottom-8 sm:right-8"
+>
+  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+    <path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+  </svg>
+</button>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-scroll-top]');
+  if (btn) {
+    const update = () => btn.setAttribute('data-visible', String(window.scrollY > window.innerHeight * 0.6));
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    btn.addEventListener('click', () => {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    });
+  }
+</script>

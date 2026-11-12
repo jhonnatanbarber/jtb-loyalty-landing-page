@@ -1,0 +1,35 @@
+---
+import FormPage from '@/components/FormPage.astro';
+import FeedbackForm from '@/components/FeedbackForm.astro';
+import type { Field } from '@/components/FeedbackForm.astro';
+
+const fields: Field[] = [
+  { name: 'nombres', label: 'Nombres', required: true, placeholder: 'Tus nombres y apellidos' },
+  { name: 'telefono', label: 'Número de teléfono', type: 'tel', required: true, placeholder: '9XX XXX XXX' },
+  { name: 'correo', label: 'Correo electrónico (opcional)', type: 'email', placeholder: 'tucorreo@ejemplo.com', full: true },
+  {
+    name: 'tipo',
+    label: '¿Qué quieres contarnos?',
+    type: 'select',
+    required: true,
+    options: ['Sugerencia', 'Felicitación'],
+    full: true,
+  },
+  {
+    name: 'mensaje',
+    label: 'Tu mensaje',
+    type: 'textarea',
+    required: true,
+    placeholder: 'Escríbenos tu sugerencia',
+  },
+];
+---
+
+<FormPage
+  title="Sugerencias"
+  eyebrow="Ayúdanos a mejorar"
+  heading="Sugerencias"
+  intro="Tus ideas hacen mejor a la barbería. Cuéntanos qué te gustó o qué podemos mejorar."
+>
+  <FeedbackForm subject="Sugerencia" fields={fields} submitLabel="Enviar mensaje" />
+</FormPage>

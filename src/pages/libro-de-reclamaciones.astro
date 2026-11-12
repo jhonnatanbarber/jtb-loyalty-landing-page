@@ -1,0 +1,41 @@
+---
+import FormPage from '@/components/FormPage.astro';
+import FeedbackForm from '@/components/FeedbackForm.astro';
+import type { Field } from '@/components/FeedbackForm.astro';
+
+const fields: Field[] = [
+  { name: 'nombres', label: 'Nombres', required: true, placeholder: 'Tus nombres y apellidos' },
+  { name: 'telefono', label: 'Número de teléfono', type: 'tel', required: true, placeholder: '9XX XXX XXX' },
+  { name: 'correo', label: 'Correo electrónico (opcional)', type: 'email', placeholder: 'tucorreo@ejemplo.com', full: true },
+  {
+    name: 'tipo',
+    label: 'Tipo',
+    type: 'select',
+    required: true,
+    options: ['Reclamo (disconformidad con el servicio)', 'Queja (malestar en la atención)'],
+  },
+  { name: 'fecha', label: 'Fecha de lo ocurrido', type: 'date', required: true },
+  {
+    name: 'detalle',
+    label: 'Detalle de tu reclamo',
+    type: 'textarea',
+    required: true,
+    placeholder: 'Cuéntanos qué pasó, con el mayor detalle posible',
+  },
+  {
+    name: 'pedido',
+    label: '¿Qué solución esperas? (opcional)',
+    type: 'textarea',
+    placeholder: 'Ej. repetir el servicio, una disculpa, otra atención',
+  },
+];
+---
+
+<FormPage
+  title="Libro de reclamaciones"
+  eyebrow="Tu opinión nos importa"
+  heading="Libro de reclamaciones"
+  intro="Si algo no salió como esperabas, cuéntanos. Revisaremos tu caso para mejorar la atención y darte una respuesta."
+>
+  <FeedbackForm subject="Libro de reclamaciones" fields={fields} submitLabel="Enviar reclamo" />
+</FormPage>

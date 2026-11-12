@@ -1,134 +1,185 @@
-Configura y construye la landing page de "Jhonnatan The Barber" en este proyecto Astro
-(ya creado con la plantilla minimal). Actúa como Frontend Engineer Senior.
+Actúa como Frontend Engineer Senior. Crea la sección completa del programa de
+fidelización en esta landing (Astro) de "Jhonnatan The Barber", barbería en Lima, Perú.
+Todo el texto en español (Perú), tono cercano pero premium.
 
-## Contexto
-- Negocio: barbería premium en Lima, Perú, desde 2015.
-- Objetivo de la landing: que nuevos clientes conozcan la barbería y reserven por
-  WhatsApp, y que los clientes actuales conozcan el programa de fidelización digital
-  (tarjeta de 10 sellos: 5 sellos = 20% de descuento, 10 sellos = 50%, corte gratis
-  en su cumpleaños).
-- Todo el texto de la página en español (Perú).
-- Es una página estática: no consume ningún API.
+=====================================================================
+REGLAS DE ESTILO (OBLIGATORIAS)
+=====================================================================
+- Reutiliza el sistema de diseño que YA existe en el proyecto: tokens y fuentes de
+  src/styles/global.css, el layout, y los patrones de los componentes actuales
+  (Hero, Services, Header, etc.). Antes de escribir, revisa esos archivos.
+- NO crees colores, fuentes, sombras ni tamaños nuevos. Si necesitas una variante,
+  derívala de los tokens existentes.
+- Misma estética: sobria, editorial, bordes finos, nada de degradados, glassmorphism,
+  brillos ni emojis. El bronce solo para sellos, puntos y premios.
+- Iconos SVG outline en línea, consistentes con los que ya usa el proyecto.
+- Mobile first, HTML semántico, contraste AA, objetivos táctiles ≥ 44px,
+  un solo <h2> por sección.
+- Solo componentes .astro. JavaScript mínimo y solo si es imprescindible
+  (por ejemplo, el acordeón de preguntas puede usar <details>/<summary> sin JS).
 
-## Stack y configuración
-1. Astro con TypeScript estricto.
-2. Tailwind CSS v4 con la integración oficial (npx astro add tailwind).
-3. @astrojs/sitemap (npx astro add sitemap).
-4. En astro.config.mjs define site: 'https://jhonnatanthebarber.pe' (lo cambiaré después).
-5. Alias "@/" apuntando a "src/" en tsconfig.json.
-6. Sin frameworks de UI (React, Vue): solo componentes .astro. JavaScript mínimo,
-   solo para el menú móvil.
+=====================================================================
+CONTEXTO DEL NEGOCIO: QUÉ DEBE ENTENDER EL VISITANTE
+=====================================================================
+El programa "Cliente VIP" tiene DOS beneficios que se acumulan en paralelo:
 
-## Diseño
-- Fuente: Poppins de Google Fonts (pesos 400, 500, 600), cargada en el layout con
-  preconnect.
-- Paleta en src/styles/global.css con @theme de Tailwind:
-  --color-background: #F6F5F2   (fondo general)
-  --color-surface:    #FFFFFF
-  --color-dark:       #141414   (secciones oscuras, header y footer)
-  --color-ink:        #1A1A1A   (texto principal)
-  --color-muted:      #6B6B6B   (texto secundario)
-  --color-line:       #E6E3DD   (bordes)
-  --color-brass:      #A8834A   (acento: solo detalles, iconos y CTA secundario)
-  --color-brass-soft: #F3ECE0
-- Estilo: clásico, premium y sobrio. Bordes finos en lugar de sombras pesadas,
-  radios de 8px, mucho espacio en blanco, grilla de 8px, ancho máximo de 1200px.
-- Prohibido: degradados, glassmorphism, efectos de brillo, emojis, ilustraciones
-  genéricas, blobs decorativos y animaciones exageradas. Solo transiciones suaves
-  en hover. Debe verse como el sitio de una marca real, no como una plantilla de IA.
-- Iconos: SVG en línea, estilo outline fino, consistentes.
-- Totalmente responsive (mobile first), con objetivos táctiles de al menos 44px.
-- Accesibilidad: HTML semántico, alt en todas las imágenes, contraste AA, foco visible.
+---------------------------------------------------------------------
+PARTE 1 · LA CARTILLA DE SELLOS (beneficio por constancia)
+---------------------------------------------------------------------
+Reemplaza la tarjeta física de cartón por una tarjeta digital.
 
-## Estructura de archivos
-src/
-├── assets/
-│   ├── logo-jhonnatan.png        (lo copiaré yo; usa este nombre)
-│   └── gallery/                  (deja la carpeta lista para fotos reales)
-├── components/
-│   ├── Header.astro
-│   ├── Hero.astro
-│   ├── Services.astro
-│   ├── LoyaltyProgram.astro
-│   ├── Gallery.astro
-│   ├── Location.astro
-│   ├── WhatsAppButton.astro
-│   └── Footer.astro
-├── data/
-│   └── site.ts
-├── layouts/
-│   └── BaseLayout.astro
-├── pages/
-│   └── index.astro
-└── styles/
-    └── global.css
-public/
-├── favicon.png
-├── og-image.jpg                  (placeholder; la reemplazaré)
-└── robots.txt                    (permitir todo y apuntar al sitemap)
+Cómo funciona:
+1. En su primera visita, el barbero registra al cliente con su nombre y celular.
+   Recibe su cartilla digital por WhatsApp con el PRIMER SELLO ya marcado.
+   No necesita descargar ninguna app: la abre desde el enlace.
+2. Cada corte suma 1 SELLO. Lo marca el barbero desde su panel; al cliente le llega
+   un aviso por WhatsApp con su avance (por ejemplo, "Llevas 6 de 10").
+3. La cartilla tiene 10 casilleros:
+   - Al completar 5 sellos → 20% de descuento en un producto o cualquier servicio.
+   - Al completar 10 sellos → 50% de descuento en un producto o cualquier servicio.
+4. Los premios se canjean mostrando la cartilla al barbero en la siguiente visita.
+   El 20% se puede usar una vez por cartilla.
+5. Al canjear el premio de los 10 sellos, la cartilla se cierra y se abre una
+   nueva automáticamente: el cliente empieza un nuevo ciclo, y su historial queda
+   guardado.
+6. Beneficio adicional: el día de su cumpleaños, el cliente recibe un corte gratis
+   (válido para precio regular).
 
-## Datos centralizados (src/data/site.ts)
-Todos los textos variables deben salir de este archivo, tipados con TypeScript:
-- name, tagline ("Tu estilo, nuestra pasión"), since (2015)
-- whatsapp: número en formato internacional y mensaje predefinido
-  ("Hola, quiero reservar un corte")
-- address, district, city, mapsUrl, coordinates (lat, lng)
-- schedule: horarios por día
-- services: lista con name, description, price (en soles, S/)
-- social: instagram, facebook, tiktok
-- loyalty: los 3 beneficios del programa
-Usa valores marcados claramente como placeholders, por ejemplo "[DIRECCIÓN]",
-"[TELÉFONO]" o precio 0 con un comentario // TODO. NO inventes direcciones,
-teléfonos, precios ni datos reales.
+Reglas a mostrar en letra pequeña:
+- Máximo 1 sello por visita.
+- La cartilla es personal e intransferible (está ligada al celular del cliente).
+- Vigencia de la cartilla: [VIGENCIA] (placeholder; ver datos).
 
-## Secciones (en este orden en index.astro)
-1. Header: logo a la izquierda; menú (Servicios, Fidelización, Galería, Ubicación);
-   botón "Reservar" que abre WhatsApp. En móvil, menú hamburguesa accesible.
-   Fondo oscuro (#141414) para que luzca el logo blanco y dorado.
-2. Hero: título principal, frase de la marca, botón principal "Reservar por WhatsApp"
-   y botón secundario "Ver servicios". Imagen de fondo opcional preparada para una
-   foto real del local (con overlay oscuro sólido, sin degradados de colores).
-3. Services: grilla de tarjetas con servicio, descripción breve y precio.
-4. LoyaltyProgram: explica en 3 pasos cómo funciona la tarjeta digital
-   (1. "Tu primer corte activa tu tarjeta", 2. "Acumula sellos en cada visita",
-   3. "Canjea tus premios"). Muestra una tarjeta visual de 10 sellos (algunos llenos
-   en bronce con monograma "JTB") y los beneficios: 20% a los 5 sellos, 50% a los 10
-   y corte gratis en el cumpleaños.
-5. Gallery: grilla responsive preparada para fotos reales de cortes, usando el
-   componente <Image /> de Astro para optimizarlas. Mientras no haya fotos, muestra
-   un estado vacío elegante, sin imágenes de stock.
-6. Location: dirección, horarios en tabla, botón "Cómo llegar" (Google Maps) y un
-   iframe de Google Maps con loading="lazy".
-7. Footer: logo, redes sociales, horario resumido, © con el año actual y un enlace
-   discreto "Acceso barberos" que apunte a https://app.jhonnatanthebarber.pe
-   (configurable en site.ts).
-8. WhatsAppButton: botón flotante fijo abajo a la derecha, con aria-label, que no
-   tape contenido en móvil.
+Ejemplo narrativo para la web:
+"Carlos se cortó por primera vez en marzo y recibió su cartilla con 1 sello.
+En su quinta visita desbloqueó el 20%, que usó en una pomada. En su décima visita
+pagó la mitad de su corte y empezó una cartilla nueva."
 
-## SEO (en BaseLayout.astro)
-- <title> y meta description en español, con props para sobrescribirlos.
-- Open Graph y Twitter Card (og:title, og:description, og:image con /og-image.jpg,
-  og:locale es_PE).
-- <link rel="canonical"> y lang="es".
-- Datos estructurados JSON-LD de tipo "BarberShop" (schema.org) generados desde
-  site.ts: nombre, dirección, teléfono, horarios (openingHoursSpecification),
-  geo, url, logo y sameAs con las redes sociales.
-- Un solo <h1> en la página (en el Hero).
+---------------------------------------------------------------------
+PARTE 2 · PUNTOS JTB (beneficio por consumo)
+---------------------------------------------------------------------
+Además de los sellos, cada servicio da PUNTOS. Mientras más servicios tome el
+cliente (o servicios de mayor valor), más puntos acumula. Los puntos se canjean por
+PRODUCTOS de la barbería desde su tarjeta digital en la web.
 
-## Reglas
-- No agregues testimonios ni reseñas inventadas. Si creas una sección de reseñas,
-  deja solo un enlace al perfil de Google Maps.
-- No uses imágenes externas ni de stock.
-- Componentes pequeños y reutilizables; nada de estilos inline repetidos.
-- El enlace de WhatsApp se arma con un helper en site.ts
-  (https://wa.me/<numero>?text=<mensaje codificado>).
+Diferencia clave que la sección debe dejar clara:
+- Los SELLOS premian la FRECUENCIA (1 sello por visita, sin importar el servicio).
+- Los PUNTOS premian el CONSUMO (cada servicio suma según su valor).
+- Se acumulan a la vez: una visita con "Corte + Barba" suma 1 sello y los puntos
+  de ese servicio.
 
-## Verificación
-1. Ejecuta npm run build y corrige hasta que compile sin errores ni advertencias.
-2. Ejecuta npm run dev y confirma que la página carga en http://localhost:4321.
-3. Revisa que no haya errores de TypeScript (npx astro check).
+Cómo se ganan (valores de EJEMPLO, configurables en datos):
+| Servicio                 | Puntos |
+|--------------------------|--------|
+| Corte clásico            | 10     |
+| Corte + barba            | 15     |
+| Perfilado de barba       | 6      |
+| Corte niño               | 8      |
+| Diseño / tinte           | 20     |
 
-Al terminar, dame:
-- la lista de archivos creados;
-- la lista de todos los placeholders que debo completar en site.ts;
-- qué imágenes debo agregar y con qué medidas (logo, favicon, og-image, galería, hero).
+Cómo se canjean:
+1. El cliente abre su tarjeta digital (el enlace de WhatsApp) y ve su saldo de puntos.
+2. Entra al catálogo de productos y elige uno que alcance con sus puntos.
+3. Genera la solicitud de canje y recoge el producto en la barbería; el barbero
+   confirma la entrega desde su panel y los puntos se descuentan.
+
+Catálogo de ejemplo (valores de EJEMPLO, configurables):
+| Producto                       | Puntos |
+|--------------------------------|--------|
+| Peine profesional              | 40     |
+| Cera / pomada para cabello     | 120    |
+| Aceite para barba              | 150    |
+| Shampoo para barba             | 180    |
+| Kit de cuidado de barba        | 300    |
+
+Ejemplo numérico para la web (debe calcularse con los datos, no escribirse fijo):
+"Si vienes cada 15 días por un Corte + barba (15 puntos), en 4 meses sumas
+8 visitas = 120 puntos: suficientes para una pomada, y además ya desbloqueaste
+el 20% de tu cartilla."
+
+Reglas de puntos a mostrar en letra pequeña (placeholders configurables):
+- Los puntos se acreditan al registrar el servicio en la barbería.
+- Vigencia de los puntos: [VIGENCIA_PUNTOS].
+- Los puntos no son canjeables por dinero ni transferibles.
+- Canje sujeto a stock del producto.
+
+Estado de esta función:
+- La cartilla de sellos ya está disponible.
+- Los puntos y el canje de productos desde la web todavía NO están implementados
+  en el sistema. Muestra la Parte 2 con una etiqueta discreta "Próximamente",
+  controlada por un flag en los datos (pointsStatus: 'proximamente' | 'activo').
+  Si el flag es 'activo', la etiqueta desaparece. Valor inicial: 'proximamente'.
+
+=====================================================================
+DATOS: TODO CONFIGURABLE (src/data/loyalty.ts)
+=====================================================================
+Crea src/data/loyalty.ts, tipado con TypeScript, con:
+- stampCard: totalStamps (10), milestones [{ stamps: 5, discount: 20 },
+  { stamps: 10, discount: 50 }], birthdayBenefit, validity (placeholder), rules[].
+- points: status ('proximamente' | 'activo'), services [{ name, points }],
+  catalog [{ name, description, points, image? }], rules[], validity (placeholder).
+- faq: [{ question, answer }].
+- Un helper que calcule el ejemplo numérico a partir de los datos
+  (frecuencia, servicio de ejemplo y meses) para que nunca quede desactualizado.
+Marca con // TODO y comentarios "Valor de ejemplo" todo lo que sea inventado
+(puntos, productos, vigencias). No inventes precios en soles.
+Si ya existe información de fidelización en src/data/site.ts, muévela aquí y
+actualiza las referencias.
+
+=====================================================================
+ESTRUCTURA DE COMPONENTES
+=====================================================================
+src/components/loyalty/
+├── LoyaltySection.astro      contenedor: título, intro y orden de las partes (id="fidelizacion")
+├── StampCardExplainer.astro  Parte 1: pasos 1-2-3 + cartilla visual + premios
+├── StampCardVisual.astro     cartilla de 10 casilleros (algunos llenos en bronce con
+│                             monograma "JTB"; los casilleros 5 y 10 marcados como premio)
+├── PointsExplainer.astro     Parte 2: cómo se ganan + tabla de servicios
+├── RewardsCatalog.astro      grilla de productos canjeables con sus puntos
+├── LoyaltyExample.astro      el ejemplo narrativo y el numérico calculado
+├── StampsVsPoints.astro      comparación breve: Sellos (frecuencia) vs Puntos (consumo)
+└── LoyaltyFaq.astro          preguntas frecuentes con <details>/<summary>
+
+Reemplaza la sección de fidelización actual en src/pages/index.astro por
+<LoyaltySection />, manteniendo el ancla #fidelizacion que usa el menú.
+
+Orden visual dentro de la sección:
+1. Título "Cliente VIP" + bajada: "Tu constancia también se nota".
+2. StampCardExplainer (con StampCardVisual).
+3. StampsVsPoints (puente entre las dos partes).
+4. PointsExplainer (+ etiqueta "Próximamente" si aplica).
+5. RewardsCatalog.
+6. LoyaltyExample.
+7. LoyaltyFaq.
+8. Llamada a la acción final: "Pide tu cartilla en tu próxima visita" + botón
+   "Reservar por WhatsApp" (reutiliza el helper de WhatsApp existente).
+
+Preguntas frecuentes mínimas:
+- ¿Necesito descargar una app? (No, la tarjeta se abre desde el enlace de WhatsApp.)
+- ¿Qué pasa si pierdo el enlace? (El barbero puede reenviarlo.)
+- ¿Los sellos y los puntos son lo mismo? (No; explicar la diferencia.)
+- ¿Puedo juntar el 20% y el 50%? (El 20% se usa a los 5 sellos; el 50% a los 10.)
+- ¿Los puntos vencen? (Usar el placeholder de vigencia.)
+- ¿Cómo canjeo un producto con mis puntos?
+
+=====================================================================
+RESTRICCIONES
+=====================================================================
+- No inventes testimonios ni reseñas.
+- No uses imágenes de stock: en el catálogo, si no hay imagen del producto,
+  usa un ícono outline o un recuadro sobrio con el nombre.
+- No cambies otras secciones de la landing salvo para reemplazar la de fidelización.
+- La landing es estática: no conectes con ningún API.
+
+=====================================================================
+VERIFICACIÓN
+=====================================================================
+1. npm run build sin errores ni advertencias.
+2. npx astro check sin errores de TypeScript.
+3. Revisa la sección en 390px y 1440px de ancho.
+
+Al terminar, entrégame:
+- la lista de archivos creados y modificados;
+- todos los valores de ejemplo y placeholders que debo confirmar con el negocio
+  (puntos por servicio, productos, vigencias);
+- cómo cambiar pointsStatus a 'activo' cuando el canje esté disponible.

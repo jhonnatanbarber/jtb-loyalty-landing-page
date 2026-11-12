@@ -1,0 +1,117 @@
+---
+import { WHATSAPP_NUMBER } from '@/data/contact';
+
+export interface Field {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'date' | 'select' | 'textarea';
+  required?: boolean;
+  placeholder?: string;
+  options?: string[];
+  /** Ocupa las dos columnas. */
+  full?: boolean;
+}
+
+interface Props {
+  /** Título del mensaje que se envía (primera línea). */
+  subject: string;
+  fields: Field[];
+  submitLabel: string;
+}
+const { subject, fields, submitLabel } = Astro.props;
+
+const control =
+  'mt-2 block w-full min-h-12 rounded border border-brass/60 bg-[#0e0e0e] px-4 py-3 font-sans text-base text-cream placeholder:text-cream/40 transition-colors focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40 sm:text-lg';
+---
+
+<form
+  data-feedback
+  data-subject={subject}
+  data-wa={`https://wa.me/${WHATSAPP_NUMBER}?text=`}
+  novalidate
+  class="grid gap-6 rounded-lg border-2 border-brass-light bg-night/90 p-6 sm:grid-cols-2 sm:p-10"
+>
+  {
+    fields.map((f) => (
+      <div class:list={[f.full || f.type === 'textarea' ? 'sm:col-span-2' : '']}>
+        <label for={f.name} class="text-base font-semibold text-cream sm:text-lg">
+          {f.label}
+          {f.required && (
+            <span class="text-gold" aria-hidden="true">
+              {' '}
+              *
+            </span>
+          )}
+        </label>
+        {f.type === 'select' ? (
+          <select id={f.name} name={f.name} required={f.required} class={control} data-label={f.label}>
+            <option value="" disabled selected>
+              Selecciona una opción
+            </option>
+            {f.options?.map((o) => (
+              <option value={o}>{o}</option>
+            ))}
+          </select>
+        ) : f.type === 'textarea' ? (
+          <textarea
+            id={f.name}
+            name={f.name}
+            rows="5"
+            required={f.required}
+            placeholder={f.placeholder}
+            class={control}
+            data-label={f.label}
+          />
+        ) : (
+          <input
+            id={f.name}
+            name={f.name}
+            type={f.type ?? 'text'}
+            required={f.required}
+            placeholder={f.placeholder}
+            class={control}
+            data-label={f.label}
+          />
+        )}
+      </div>
+    ))
+  }
+
+  <div class="sm:col-span-2">
+    <button
+      type="submit"
+      class="inline-flex min-h-16 w-full items-center justify-center rounded bg-gold px-10 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream sm:w-auto"
+    >
+      {submitLabel}
+    </button>
+    <p class="mt-4 text-sm text-cream/60 sm:text-base" data-status role="status">
+      Al enviar, se abrirá WhatsApp con tu mensaje listo para mandarlo a la barbería. Los campos con * son obligatorios.
+    </p>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-feedback]');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        status.textContent = 'Revisa los campos marcados y vuelve a intentarlo.';
+        return;
+      }
+      const lines = [`*${form.dataset.subject}*`, ''];
+      form
+        .querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-label]')
+        .forEach((el) => {
+          const value = el.value.trim();
+          if (value) lines.push(`*${el.dataset.label}:* ${value}`);
+        });
+      const url = (form.dataset.wa ?? '') + encodeURIComponent(lines.join('\n'));
+      window.open(url, '_blank', 'noopener');
+      status.textContent =
+        'Listo: se abrió WhatsApp. Solo falta que pulses "Enviar" allí. ¡Gracias por ayudarnos a mejorar!';
+    });
+  }
+</script>

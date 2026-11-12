@@ -1,0 +1,305 @@
+---
+import FluxLines from '@/components/flux-lines/FluxLines';
+import {
+  steps,
+  benefits,
+  TOTAL_STAMPS,
+  EXAMPLE_FILLED,
+  earn,
+  redeemProducts,
+  redeemSteps,
+  POINTS_PER_CUT,
+} from '@/data/loyalty';
+
+interface Props {
+  whatsapp: string;
+}
+const { whatsapp } = Astro.props;
+
+const stamps = Array.from({ length: TOTAL_STAMPS }, (_, i) => {
+  const n = i + 1;
+  const reward = benefits.find((b) => b.stamps === n);
+  return { n, filled: n <= EXAMPLE_FILLED, reward: reward?.value };
+});
+---
+
+<section
+  id="fidelizacion"
+  aria-labelledby="fidelizacion-title"
+  class="relative isolate select-none overflow-hidden border-t border-brass/30 bg-night px-6 py-24 font-sans text-cream lg:px-10 lg:py-32"
+>
+  <div class="absolute inset-0 -z-10 opacity-60">
+    <FluxLines
+      client:visible
+      colors={['#a8834a', '#a8834a', '#a8834a']}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+    />
+  </div>
+
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Encabezado -->
+    <header class="text-center">
+      <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">
+        Programa de recompensas
+      </p>
+      <h2
+        id="fidelizacion-title"
+        class="mt-4 text-4xl font-semibold uppercase tracking-[0.04em] sm:text-5xl lg:text-6xl"
+      >
+        Beneficios
+      </h2>
+      <div class="mt-8 flex items-center justify-center gap-4" aria-hidden="true">
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+        <span class="h-2 w-2 rotate-45 bg-brass"></span>
+        <span class="h-px w-16 bg-brass sm:w-28"></span>
+      </div>
+      <p class="mx-auto mt-8 max-w-2xl text-lg text-cream/80 sm:text-xl">
+        Premiamos a quienes nos eligen una y otra vez, con una tarjeta de {TOTAL_STAMPS} sellos 100% digital.
+      </p>
+    </header>
+
+    <div class="mt-16 grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+      <!-- Cómo funciona -->
+      <div>
+        <h3 class="text-lg font-semibold uppercase tracking-[0.06em] text-brass-light sm:text-2xl">
+          Cómo funciona
+        </h3>
+        <ol class="mt-8 space-y-8">
+          {
+            steps.map((s, i) => (
+              <li class="flex gap-5">
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-brass-light text-lg font-semibold text-gold">
+                  {i + 1}
+                </span>
+                <div>
+                  <p class="text-lg font-semibold sm:text-xl">{s.title}</p>
+                  <p class="mt-1 text-base text-cream/70 sm:text-lg">{s.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <!-- Tarjeta de sellos -->
+      <div>
+        <div
+          data-loyalty-card
+          class="rounded-2xl border-2 border-brass-light bg-[#0e0e0e] p-6 sm:p-8"
+          role="img"
+          aria-label={`Ejemplo de tarjeta de ${TOTAL_STAMPS} sellos con ${EXAMPLE_FILLED} completados. El sello 5 da 20% de descuento y el sello 10 da 50%.`}
+        >
+          <div class="flex items-center justify-between gap-4">
+            <p class="text-base font-semibold uppercase tracking-[0.06em] sm:text-lg">Jhonnatan The Barber</p>
+            <p class="text-sm font-medium text-brass-light sm:text-base">Tarjeta digital</p>
+          </div>
+          <span class="my-5 block h-px w-full bg-brass/40" aria-hidden="true"></span>
+
+          <ul class="grid grid-cols-5 gap-3 sm:gap-4">
+            {
+              stamps.map((st) => (
+                <li class="relative">
+                  <div
+                    data-stamp
+                    style={`--i:${st.n}`}
+                    class:list={[
+                      'stamp flex aspect-square items-center justify-center rounded-full border-2 text-xs font-semibold sm:text-sm',
+                      st.filled
+                        ? 'border-brass-light bg-gold text-night'
+                        : 'border-dashed border-brass/60 text-cream/50',
+                    ]}
+                  >
+                    {st.filled ? 'JTB' : st.n}
+                  </div>
+                  {st.reward && (
+                    <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-brass-light bg-night px-2 py-0.5 text-[11px] font-semibold text-gold sm:text-xs">
+                      {st.reward}
+                    </span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+
+          <p class="mt-8 text-center text-sm text-cream/60 sm:text-base">Ejemplo de tarjeta</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premios -->
+    <ul class="mt-16 grid gap-6 md:grid-cols-3">
+      {
+        benefits.map((b) => (
+          <li
+            class:list={[
+              'relative rounded-lg bg-night/85 p-8 text-center transition-colors',
+              b.stamps === null
+                ? 'border-[3px] border-gold shadow-[0_0_0_6px_rgba(240,204,120,0.15)]'
+                : 'border border-brass/40 hover:border-brass-light',
+            ]}
+          >
+            {b.stamps === null && (
+              <span class="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gold px-5 py-1 text-sm font-semibold uppercase tracking-[0.08em] text-night">
+                Regalo
+              </span>
+            )}
+            <p class="text-5xl font-semibold leading-none text-gold sm:text-6xl">{b.value}</p>
+            <p class="mt-3 text-lg font-semibold uppercase tracking-[0.04em] sm:text-xl">{b.title}</p>
+            <p class="mt-3 text-base text-cream/70 sm:text-lg">{b.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Canje de productos por puntos -->
+    <div class="mt-24 border-t border-brass/30 pt-20">
+      <header class="text-center">
+        <p class="text-base font-semibold uppercase tracking-[0.12em] text-brass-light sm:text-lg">
+          Puntos que valen
+        </p>
+        <h3 class="mt-4 text-3xl font-semibold uppercase tracking-[0.04em] sm:text-4xl lg:text-5xl">
+          Cada corte te regala <span class="text-gold">productos</span>
+        </h3>
+        <p class="mx-auto mt-6 max-w-3xl text-lg text-cream/80 sm:text-xl">
+          Además de tus descuentos, cada servicio suma puntos a tu cuenta. Mientras más estilo te haces, más puntos
+          acumulas, y los cambias por los productos que usas a diario, directo desde nuestra web.
+        </p>
+      </header>
+
+      <ol class="mt-12 grid gap-6 md:grid-cols-3">
+        {
+          redeemSteps.map((s, i) => (
+            <li class="flex gap-4 rounded-lg border border-brass/40 bg-night/85 p-6">
+              <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold text-lg font-semibold text-night">
+                {i + 1}
+              </span>
+              <div>
+                <p class="text-lg font-semibold sm:text-xl">{s.title}</p>
+                <p class="mt-1 text-base text-cream/70 sm:text-lg">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div
+        role="note"
+        class="mx-auto mt-10 flex max-w-4xl items-start gap-4 rounded-lg border-2 border-dashed border-gold bg-night/90 p-5 sm:items-center sm:p-6"
+      >
+        <svg viewBox="0 0 24 24" class="mt-0.5 h-8 w-8 shrink-0 text-gold sm:mt-0" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 11v6M12 7.5v.01" stroke-linecap="round"></path>
+        </svg>
+        <p class="text-base text-cream/90 sm:text-lg">
+          <strong class="font-semibold uppercase tracking-[0.04em] text-gold">Ejemplo ilustrativo.</strong>
+          Los puntos, servicios y productos que ves a continuación son solo una referencia para explicarte cómo
+          funciona. No son valores reales. Consulta en la barbería los puntos vigentes.
+        </p>
+      </div>
+
+      <div class="mt-12 grid items-start gap-8 lg:grid-cols-5">
+        <!-- Cuánto ganas -->
+        <div class="rounded-lg border border-brass/40 bg-night/85 p-6 sm:p-8 lg:col-span-2">
+          <h4 class="text-lg font-semibold uppercase tracking-[0.06em] text-brass-light sm:text-xl">
+            Así ganas puntos <span class="ml-2 inline-block rounded-full border border-brass-light px-3 py-0.5 align-middle text-xs font-semibold normal-case tracking-normal text-gold sm:text-sm">Solo ejemplo</span>
+          </h4>
+          <ul class="mt-6 space-y-4">
+            {
+              earn.map((e) => (
+                <li class="flex items-baseline gap-3 text-lg sm:text-xl">
+                  <span class="font-medium">{e.service}</span>
+                  <span class="mb-1 min-w-4 flex-1 self-end border-b border-dotted border-brass/60" aria-hidden="true" />
+                  <span class="whitespace-nowrap font-semibold text-gold">+{e.points} pts</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-6 text-base text-cream/70 sm:text-lg">
+            Combina servicios en una misma visita y suma aún más puntos.
+          </p>
+        </div>
+
+        <!-- Qué puedes canjear -->
+        <div class="lg:col-span-3">
+          <h4 class="text-lg font-semibold uppercase tracking-[0.06em] text-brass-light sm:text-xl">
+            Canjea por estos productos <span class="ml-2 inline-block rounded-full border border-brass-light px-3 py-0.5 align-middle text-xs font-semibold normal-case tracking-normal text-gold sm:text-sm">Solo ejemplo</span>
+          </h4>
+          <ul class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {
+              redeemProducts.map((p) => (
+                <li class="flex flex-col rounded-lg border border-brass/40 bg-night/85 p-5 transition-colors hover:border-gold">
+                  <p class="text-lg font-semibold sm:text-xl">{p.name}</p>
+                  <p class="mt-3 text-3xl font-semibold leading-none text-gold">
+                    {p.points} <span class="text-lg font-medium">pts</span>
+                  </p>
+                  <p class="mt-3 text-sm text-cream/65 sm:text-base">
+                    Equivale a {Math.ceil(p.points / POINTS_PER_CUT)} cortes
+                  </p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <p class="mt-8 text-center text-base text-cream/60 sm:text-lg">
+        * Ejemplo para explicar el sistema de puntos: los valores mostrados no son reales y no representan precios ni canjes confirmados.
+      </p>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-16 text-center">
+      <p class="text-xl font-semibold sm:text-2xl">Pregunta por tu tarjeta en tu próxima visita</p>
+      <a
+        href={whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-8 inline-flex min-h-16 items-center justify-center rounded bg-gold px-12 font-sans text-lg font-semibold uppercase tracking-[0.06em] text-night transition-colors hover:bg-cream"
+      >
+        Reservar mi cita
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  [data-loyalty-card] .stamp {
+    transition:
+      transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.4s;
+    transition-delay: calc(var(--i) * 90ms);
+  }
+  [data-loyalty-card]:not(.in-view) .stamp {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-loyalty-card] .stamp {
+      transition: none;
+    }
+    [data-loyalty-card]:not(.in-view) .stamp {
+      transform: none;
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  const card = document.querySelector<HTMLElement>('[data-loyalty-card]');
+  if (card) {
+    new IntersectionObserver(
+      ([entry], obs) => {
+        if (entry.isIntersecting) {
+          card.classList.add('in-view');
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    ).observe(card);
+  }
+</script>
